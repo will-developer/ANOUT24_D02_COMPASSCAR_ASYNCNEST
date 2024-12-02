@@ -1,11 +1,15 @@
-FROM node:22-alpine as dev
+FROM node:22
 
-WORKDIR /app
+WORKDIR /usr/src/app
 
-ENV NODE_ENV development
-
-COPY --chown=node:node . .
+COPY package*.json ./
 
 RUN npm install
 
-USER node
+RUN npm install -g @nestjs/cli
+
+EXPOSE 3000
+
+ENV NODE_ENV development
+
+CMD [ "npm", "run", "start:dev" ]

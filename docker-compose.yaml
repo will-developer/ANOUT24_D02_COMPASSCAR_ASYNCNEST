@@ -1,34 +1,35 @@
 services:
+  app:
+    build:
+      context: ./backend
+      dockerfile: Dockerfile
+    container_name: nestjs
+    ports:
+    - "3000:3000"
+    volumes:
+      - ./backend:/usr/src/app
+      - /usr/src/app/node_modules
+    environment:
+      - DB_HOST=db
+      - DB_PORT=3306
+      - DB_USER=root
+      - DB_PASSWORD=root
+      - DB_NAME=database
+    depends_on:
+      - db
+    restart: unless-stopped
+
   db:
     image: mysql:9
-    container_name: nestjs-db
+    container_name: db
     restart: unless-stopped
     environment:
-      MYSQL_USER: root
       MYSQL_ROOT_PASSWORD: root 
       MYSQL_DATABASE: database
-      mysql_passowrd: password
     ports:
       - "3306:3306"
     volumes:
       - db_data:/var/lib/mysql
-  api:
-    container_name: nestjs
-    restart: unless-stopped
-    build:
-      context: .
-      dockerfile: ./backend/Dockerfile
-      target: dev
-    volumes:
-      - ./backend:/app
-      - /app/node_modules
-    env_file:
-      - ./backend/Dockerenv
-    ports:
-      - 3000:3000
-    depends_on:
-      - db
-    command: npx nest start --watch
 
 volumes:
   db_data:

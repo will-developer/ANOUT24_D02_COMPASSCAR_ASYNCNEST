@@ -1,17 +1,16 @@
-//import { Car } from '@prisma/client'
+import { Car } from '@prisma/client';
 
-export class Car /*implements Car*/ {
+export class CarEntity implements Car {
   id: number;
   brand: string;
   model: string;
   plate: string;
   year: number;
-  kilometers: number;
+  km: number;
   dailyPrice: number;
   status: boolean;
-  created_at: Date;
-  updated_at: Date;
-  inativatedAt?: Date | null;
-  // items: CarItem[]
-  // orders: Order[]
+  createdAt: Date;
+  updatedAt: Date;
+  inativatedAt: Date;
 }
+//todo: precisará integrar junto com a entidade de Orders

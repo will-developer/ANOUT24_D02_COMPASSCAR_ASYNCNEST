@@ -1,11 +1,14 @@
 import { Injectable } from '@nestjs/common';
 import { CreateCarDto } from './dto/create-car.dto';
 import { UpdateCarDto } from './dto/update-car.dto';
+import { CarRepository } from './repository/car.repository';
 
 @Injectable()
 export class CarService {
+  constructor(private readonly repository: CarRepository) {}
+
   create(createCarDto: CreateCarDto) {
-    return 'This action adds a new car';
+    return this.repository.create(createCarDto);
   }
 
   findAll() {

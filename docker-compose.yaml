@@ -1,20 +1,17 @@
 services:
   app:
-    build:
-      context: ./backend
-      dockerfile: Dockerfile
+    image: node:22
+    working_dir: /usr/src/app
     container_name: nestjs
     ports:
-    - "3000:3000"
+      - "3000:3000"
     volumes:
-      - ./backend:/usr/src/app
-      #- /usr/src/app/node_modules
+    - .:/usr/src/app
+    #- /usr/src/app/node_modules
     environment:
-      - DB_HOST=db
-      - DB_PORT=3306
-      - DB_USER=root
-      - DB_PASSWORD=root
-      - DB_NAME=database
+      DATABASE_URL: "mysql://root:root@db:3306/database"
+      NODE_ENV: development
+    command: sh -c "npm install && npx prisma migrate deploy && npm run start:dev"
     depends_on:
       - db
     restart: unless-stopped

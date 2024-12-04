@@ -84,4 +84,18 @@ export class CarRepository {
       },
     });
   }
+
+  async delete(id: number): Promise<CarEntity> {
+    await this.prisma.carItem.deleteMany({
+      where: {
+        carId: id,
+      },
+    });
+
+    return this.prisma.car.delete({
+      where: {
+        id,
+      },
+    });
+  }
 }

@@ -51,4 +51,14 @@ export class ClientsRepository {
 			},
 		});
 	}
+
+	async deleteClient(id: number) {
+		return this.prisma.client.update({
+			where: { id },
+			data: {
+				status: false,
+				inativatedAt: new Date(),
+			},
+		});
+	}
 }

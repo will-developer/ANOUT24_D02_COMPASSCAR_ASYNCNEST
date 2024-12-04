@@ -81,4 +81,13 @@ export class ClientsService {
 
 		return updatedClient;
 	}
+
+	async deleteClient(id: number) {
+		const client = await this.repository.findClientById(id);
+		if (!client) {
+			throw new NotFoundException("Client not found");
+		}
+
+		return this.repository.deleteClient(id);
+	}
 }

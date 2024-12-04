@@ -1,4 +1,12 @@
-import { Body, Controller, Get, Param, Post, Put } from "@nestjs/common";
+import {
+	Body,
+	Controller,
+	Delete,
+	Get,
+	Param,
+	Post,
+	Put,
+} from "@nestjs/common";
 import { ClientsService } from "./clients.service";
 import { CreateClientDto } from "./dtos/create-client.dto";
 import { UpdateClientDto } from "./dtos/update-client.dto";
@@ -20,5 +28,10 @@ export class ClientsController {
 	@Get(":id")
 	async getClientById(@Param("id") id: number) {
 		return this.clientsService.getClientById(id);
+	}
+
+	@Delete(":id")
+	async deleteClient(@Param("id") id: number) {
+		return this.clientsService.deleteClient(id);
 	}
 }

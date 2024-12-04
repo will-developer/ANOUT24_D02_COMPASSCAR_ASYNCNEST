@@ -7,7 +7,10 @@ import {
   Matches,
   Min,
   Max,
+  ArrayMinSize,
+  IsArray,
 } from 'class-validator';
+import { CreateCarItemDto } from './create-carItem.dto';
 
 export class CreateCarDto {
   @IsString()
@@ -45,4 +48,8 @@ export class CreateCarDto {
 
   @IsBoolean()
   status?: boolean = true;
+
+  @IsArray()
+  @ArrayMinSize(1, { message: 'At least one item must be provided.' })
+  items: CreateCarItemDto[];
 }

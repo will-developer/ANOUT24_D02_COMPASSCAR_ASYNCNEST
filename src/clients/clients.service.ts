@@ -5,6 +5,7 @@ import {
 } from "@nestjs/common";
 import { CreateClientDto } from "./dtos/create-client.dto";
 import { ClientsRepository } from "./repository/client.repository";
+import { UpdateClientDto } from "./dtos/update-client.dto";
 
 @Injectable()
 export class ClientsService {
@@ -23,5 +24,15 @@ export class ClientsService {
 		}
 
 		return this.repository.createClient(data);
+	}
+
+	async getClientById(id: number) {
+		const client = await this.repository.findClientById(id);
+
+		if (!client) {
+			throw new NotFoundException("Client not found");
+		}
+
+		return client;
 	}
 }

@@ -30,4 +30,12 @@ export class ClientsRepository {
 			emailExists: existingClientEmail !== null,
 		};
 	}
+
+	async findClientById(id: number) {
+		return this.prisma.client.findUnique({
+			where: {
+				id,
+			},
+		});
+	}
 }

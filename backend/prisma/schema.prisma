@@ -22,7 +22,6 @@ model User {
   createdAt    DateTime  @default(now())
   updatedAt    DateTime  @updatedAt
   deletedAt    DateTime? 
-  clients      Client[]
 
   @@map("user")
 }
@@ -39,9 +38,7 @@ model Client {
   updatedAt    DateTime  @updatedAt
   inativatedAt    DateTime? 
   orders       Order[]
-  userId       Int
-  user         User      @relation(fields: [userId], references: [id])
-
+ 
   @@map("client")
 }
 

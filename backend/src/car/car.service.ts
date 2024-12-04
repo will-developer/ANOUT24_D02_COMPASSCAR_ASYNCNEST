@@ -16,7 +16,7 @@ export class CarService {
   }
 
   findOne(id: number) {
-    return `This action returns a #${id} car`;
+    return this.repository.findOne(id);
   }
 
   update(id: number, updateCarDto: UpdateCarDto) {

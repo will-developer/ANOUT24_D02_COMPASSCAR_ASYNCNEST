@@ -42,4 +42,20 @@ export class CarRepository {
       },
     });
   }
+
+  async findOne(id: number): Promise<CarEntity> {
+    return this.prisma.car.findUnique({
+      where: {
+        id,
+      },
+      include: {
+        items: {
+          select: {
+            name: true,
+            carId: true,
+          },
+        },
+      },
+    });
+  }
 }

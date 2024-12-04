@@ -46,11 +46,13 @@ export class ClientsService {
 	}
 
 	async updateClient(id: number, data: UpdateClientDto) {
+		// check if the client exists in database
 		const client = await this.repository.findClientById(id);
 		if (!client) {
 			throw new NotFoundException("Client not found");
 		}
 
+		// check if the new cpf already exists in database
 		if (data.cpf && data.cpf !== client.cpf) {
 			const cpfExists = await this.repository.findClientByCpfOrEmail(
 				data.cpf,
@@ -61,6 +63,7 @@ export class ClientsService {
 			}
 		}
 
+		// check if the new email already exists in database
 		if (data.email && data.email !== client.email) {
 			const emailExists = await this.repository.findClientByCpfOrEmail(
 				null,
@@ -71,6 +74,7 @@ export class ClientsService {
 			}
 		}
 
+		// If it passes the validations, it updates the database with the new data
 		const updatedClient = await this.repository.updateClient(id, {
 			...data,
 		});

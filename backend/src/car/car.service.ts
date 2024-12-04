@@ -20,7 +20,7 @@ export class CarService {
   }
 
   update(id: number, updateCarDto: UpdateCarDto) {
-    return `This action updates a #${id} car`;
+    return this.repository.update(id, updateCarDto);
   }
 
   remove(id: number) {

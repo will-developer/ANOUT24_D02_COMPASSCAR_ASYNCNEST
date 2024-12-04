@@ -2,6 +2,7 @@ import { Injectable } from '@nestjs/common';
 import { CreateCarDto } from '../dto/create-car.dto';
 import { CarEntity } from '../entities/car.entity';
 import { PrismaService } from '../../prisma/prisma.service';
+import { UpdateCarDto } from '../dto/update-car.dto';
 
 @Injectable()
 export class CarRepository {
@@ -47,6 +48,31 @@ export class CarRepository {
     return this.prisma.car.findUnique({
       where: {
         id,
+      },
+      include: {
+        items: {
+          select: {
+            name: true,
+            carId: true,
+          },
+        },
+      },
+    });
+  }
+
+  async update(id: number, updateCarDto: UpdateCarDto): Promise<CarEntity> {
+    const { items, ...carData } = updateCarDto;
+    return this.prisma.car.update({
+      where: {
+        id,
+      },
+      data: {
+        ...carData,
+        items: {
+          create: items.map((item) => ({
+            name: item.name,
+          })),
+        },
       },
       include: {
         items: {

@@ -1,5 +1,6 @@
 import {
 	BadRequestException,
+	ConflictException,
 	Injectable,
 	NotFoundException,
 } from "@nestjs/common";
@@ -12,15 +13,23 @@ export class ClientsService {
 	constructor(private readonly repository: ClientsRepository) {}
 
 	async createClient(data: CreateClientDto) {
-		const { cpfExists, emailExists } =
-			await this.repository.findClientByCpfOrEmail(data.cpf, data.email);
+		const client = await this.repository.findClientByCpfOrEmail(
+			data.cpf,
+			data.email
+		);
 
-		if (cpfExists) {
-			throw new BadRequestException("A client with this CPF already exists.");
+		if (client) {
+			if (client.cpf === data.cpf) {
+				throw new BadRequestException("A client with this CPF already exists.");
+			}
 		}
 
-		if (emailExists) {
-			throw new BadRequestException("A client with this Email already exists.");
+		if (client) {
+			if (client.email === data.email) {
+				throw new BadRequestException(
+					"A client with this Email already exists."
+				);
+			}
 		}
 
 		return this.repository.createClient(data);
@@ -34,5 +43,38 @@ export class ClientsService {
 		}
 
 		return client;
+	}
+
+	async updateClient(id: number, data: UpdateClientDto) {
+		const client = await this.repository.findClientById(id);
+		if (!client) {
+			throw new NotFoundException("Client not found");
+		}
+
+		if (data.cpf && data.cpf !== client.cpf) {
+			const cpfExists = await this.repository.findClientByCpfOrEmail(
+				data.cpf,
+				null
+			);
+			if (cpfExists) {
+				throw new ConflictException("A client with this CPF already exists.");
+			}
+		}
+
+		if (data.email && data.email !== client.email) {
+			const emailExists = await this.repository.findClientByCpfOrEmail(
+				null,
+				data.email
+			);
+			if (emailExists) {
+				throw new ConflictException("A client with this email already exists.");
+			}
+		}
+
+		const updatedClient = await this.repository.updateClient(id, {
+			...data,
+		});
+
+		return updatedClient;
 	}
 }

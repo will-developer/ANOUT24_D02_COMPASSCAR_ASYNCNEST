@@ -11,10 +11,8 @@ export class ClientsService {
 	constructor(private readonly repository: ClientsRepository) {}
 
 	async createClient(data: CreateClientDto) {
-		const { cpfExists, emailExists } = await this.repository.exists(
-			data.cpf,
-			data.email
-		);
+		const { cpfExists, emailExists } =
+			await this.repository.findClientByCpfOrEmail(data.cpf, data.email);
 
 		if (cpfExists) {
 			throw new BadRequestException("A client with this CPF already exists.");

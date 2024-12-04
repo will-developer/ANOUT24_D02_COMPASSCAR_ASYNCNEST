@@ -10,7 +10,7 @@ export class ClientsRepository {
 		return this.prisma.client.create({ data });
 	}
 
-	async exists(cpf: string, email: string) {
+	async findClientByCpfOrEmail(cpf: string, email: string) {
 		const existingClientEmail = await this.prisma.client.findFirst({
 			where: {
 				email,

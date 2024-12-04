@@ -8,8 +8,30 @@ export class CarRepository {
   constructor(private readonly prisma: PrismaService) {}
 
   async create(createCarDto: CreateCarDto): Promise<CarEntity> {
+    const { items, ...carData } = createCarDto;
+
     return this.prisma.car.create({
-      data: createCarDto,
+      data: {
+        ...carData,
+        items: {
+          create: items.map((item) => ({
+            name: item.name,
+          })),
+        },
+      },
+      include: {
+        items: {
+          select: {
+            name: true,
+            carId: true,
+          },
+        },
+      },
+    });
+  }
+
+  async findAll(): Promise<CarEntity[]> {
+    return await this.prisma.car.findMany({
       include: {
         items: {
           select: {

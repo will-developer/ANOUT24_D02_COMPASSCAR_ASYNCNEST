@@ -7,5 +7,17 @@ import { PrismaService } from '../../prisma/prisma.service';
 export class CarRepository {
   constructor(private readonly prisma: PrismaService) {}
 
-  async create(createUserDto: CreateCarDto): Promise<CarEntity> {}
+  async create(createCarDto: CreateCarDto): Promise<CarEntity> {
+    return this.prisma.car.create({
+      data: createCarDto,
+      include: {
+        items: {
+          select: {
+            name: true,
+            carId: true,
+          },
+        },
+      },
+    });
+  }
 }

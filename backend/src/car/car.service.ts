@@ -2,6 +2,7 @@ import { BadRequestException, Injectable } from '@nestjs/common';
 import { CreateCarDto } from './dto/create-car.dto';
 import { UpdateCarDto } from './dto/update-car.dto';
 import { CarRepository } from './repository/car.repository';
+import { CarFilters } from './filters/carFilters';
 
 @Injectable()
 export class CarService {
@@ -17,8 +18,22 @@ export class CarService {
     return this.repository.create(createCarDto);
   }
 
-  findAll() {
-    return this.repository.findAll();
+  async findAll(page: number, limit: number = 10, filters: CarFilters) {
+    if (page < 1 || limit < 1) {
+      throw new Error('Page and limit must be greater than zero.');
+    }
+
+    if (filters.km && filters.km < 0) {
+      throw new Error('Kilometers cannot be negative.');
+    }
+
+    if (filters.dailyPrice && filters.dailyPrice < 0) {
+      throw new Error('Daily price cannot be negative.');
+    }
+
+    const skipRegister = (page - 1) * limit;
+
+    return this.repository.findAll(skipRegister, limit, filters);
   }
 
   findOne(id: number) {

@@ -22,9 +22,6 @@ export class ClientsService {
 			if (client.cpf === data.cpf) {
 				throw new BadRequestException("A client with this CPF already exists.");
 			}
-		}
-
-		if (client) {
 			if (client.email === data.email) {
 				throw new BadRequestException(
 					"A client with this Email already exists."
@@ -82,6 +79,7 @@ export class ClientsService {
 		return updatedClient;
 	}
 
+	//	TO DO: caso tenha pedidos em aberto, negar a inativação.
 	async deleteClient(id: number) {
 		const client = await this.repository.findClientById(id);
 		if (!client) {

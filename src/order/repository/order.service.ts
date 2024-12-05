@@ -67,6 +67,54 @@ export class OrderService {
       throw new NotFoundException('Order not found');
     }
 
+//updates order´s fields
+    let rentalFee = order.rentalFee;
+    let totalAmount = order.totalAmount;
+    let updatedData: any = { statusOrder: updateOrderDto.statusOrder };
+  
+    //updates location data and recalculates rental fee if CEP is sent
+    if (updateOrderDto.cep) {
+      const address = await this.getAddressByCep(updateOrderDto.cep);
+      rentalFee = parseFloat(address.gia) / 100;
+      updatedData = { ...updatedData, cep: updateOrderDto.cep, uf: address.uf, city: address.localidade, rentalFee };
+    }
+  
+    //recalculates total amount if dates or the car are updated
+    if (updateOrderDto.startDate || updateOrderDto.endDate || updateOrderDto.carId) {
+      const days = this.calculateDays(updateOrderDto.startDate || order.startDate, updateOrderDto.endDate || order.endDate);
+      totalAmount = (car.dailyPrice * days) + rentalFee;
+      updatedData = { ...updatedData, totalAmount };
+    }
+  
+    //updates order status
+    if (updateOrderDto.statusOrder) {
+      if (updateOrderDto.statusOrder === 'cancelled' && order.statusOrder !== 'open') {
+        throw new BadRequestException('Only open orders can be canceled');
+      }
+      if (updateOrderDto.statusOrder === 'approved' && order.statusOrder !== 'open') {
+        throw new BadRequestException('Only open orders can be approved');
+      }
+      if (updateOrderDto.statusOrder === 'closed' && order.statusOrder !== 'approved') {
+        throw new BadRequestException('Only approved orders can be closed');
+      }
+  
+      //calculates late fee if order is closed after close date
+      if (updateOrderDto.statusOrder === 'closed' && updateOrderDto.endDate && new Date(updateOrderDto.endDate) < new Date()) {
+        const daysExceeded = this.calculateDays(updateOrderDto.endDate, new Date().toISOString());
+        const lateFee = (car.dailyPrice * 2) * daysExceeded;
+        updatedData = { ...updatedData, lateFee, closeDate: new Date() };
+      }
+    }
+  
+    //updates order on database
+    const updatedOrder = await this.prisma.order.update({
+      where: { id },
+      data: updatedData,
+    });
+  
+    return this.convertToResponseDto(updatedOrder);
+  }
+
     async findAll(cpf: string, status: string, page: number, limit: number): Promise<OrderResponseDto[]> {
     const orders = await this.prisma.order.findMany({
       where: {

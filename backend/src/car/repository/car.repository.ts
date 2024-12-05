@@ -60,6 +60,10 @@ export class CarRepository {
     });
   }
 
+  async findByPlate(plate: string) {
+    return this.prisma.car.findUnique({ where: { plate } });
+  }
+
   async update(id: number, updateCarDto: UpdateCarDto): Promise<CarEntity> {
     const { items, ...carData } = updateCarDto;
     return this.prisma.car.update({

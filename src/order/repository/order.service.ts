@@ -4,10 +4,23 @@ import { CreateOrderDto, StatusOrder } from '../dto/create-order.dto';
 import { UpdateOrderDto } from '../dto/update-order.dto';
 import { OrderResponseDto } from '../dto/order-response.dto';
 import { Order } from '@prisma/client';
+import axios from 'axios';
 
 @Injectable()
 export class OrderService {
   constructor(private prisma: PrismaService) {}
+
+private async getAddressByCep(cep: string) {
+    try {
+    const response = await axios.get(`https://viacep.com.br/ws/${cep}/json/`);
+    if (response.data.erro) {
+      throw new BadRequestException('Invalid CEP');
+    }
+    return response.data;
+  } catch (error) {
+    throw new BadRequestException('Error while fetching address from VIACEP');
+  }
+}
 
  private calculateDays(startDate: Date | string, endDate: Date | string): number {
     const start = typeof startDate === 'string' ? new Date(startDate) : startDate;
@@ -19,6 +32,9 @@ export class OrderService {
 
    async create(createOrderDto: CreateOrderDto): Promise<OrderResponseDto> {
     const { clientId, carId, startDate, endDate, cep } = createOrderDto;
+
+ //validates and searches for CEP in the VIA API
+    const address = await this.getAddressByCep(cep);
 
 //rental fee calculation
    const rentalFee = parseFloat(address.gia) / 100;

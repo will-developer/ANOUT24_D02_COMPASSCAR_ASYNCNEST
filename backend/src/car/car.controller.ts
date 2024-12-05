@@ -1,7 +1,17 @@
-import { Controller, Get, Post, Body, Patch, Param, Delete } from '@nestjs/common';
+import {
+  Controller,
+  Get,
+  Post,
+  Body,
+  Patch,
+  Param,
+  Delete,
+  Query,
+} from '@nestjs/common';
 import { CarService } from './car.service';
 import { CreateCarDto } from './dto/create-car.dto';
 import { UpdateCarDto } from './dto/update-car.dto';
+import { CarFilters } from './filters/carFilters';
 
 @Controller('car')
 export class CarController {
@@ -13,8 +23,18 @@ export class CarController {
   }
 
   @Get()
-  findAll() {
-    return this.carService.findAll();
+  async findAll(
+    @Query('page') page: number = 1,
+    @Query('limit') limit: number = 10,
+    @Query('brand') brand?: string,
+    @Query('km') km?: number,
+    @Query('year') year?: number,
+    @Query('status') status?: boolean,
+    @Query('dailyPrice') dailyPrice?: number,
+  ) {
+    const filters: CarFilters = { brand, km, year, status, dailyPrice };
+
+    return await this.carService.findAll(page, limit, filters);
   }
 
   @Get(':id')

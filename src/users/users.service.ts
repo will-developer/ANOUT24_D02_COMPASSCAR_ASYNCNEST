@@ -47,4 +47,14 @@ export class UsersService {
         }); 
 
     }
+
+    async findById(id: number){
+        const user = await this.userRepository.findById(id);
+        if (!user) throw new NotFoundException('user not found.');
+
+        const { password, ...userWithoutPassword } = user;
+        return userWithoutPassword;
+    }
+
+    
 }

@@ -9,8 +9,35 @@ import { Order } from '@prisma/client';
 export class OrderService {
   constructor(private prisma: PrismaService) {}
 
+ private calculateDays(startDate: Date | string, endDate: Date | string): number {
+    const start = typeof startDate === 'string' ? new Date(startDate) : startDate;
+    const end = typeof endDate === 'string' ? new Date(endDate) : endDate;
+  
+    const timeDifference = end.getTime() - start.getTime();
+    return timeDifference / (1000 * 3600 * 24); 
+  }  
+
    async create(createOrderDto: CreateOrderDto): Promise<OrderResponseDto> {
     const { clientId, carId, startDate, endDate, cep } = createOrderDto;
+
+//rental fee calculation
+   const rentalFee = parseFloat(address.gia) / 100;
+    if (isNaN(rentalFee)) {
+      throw new BadRequestException('Invalid rental fee calculated from the address.');
+    }
+  
+    //number of days calculation
+    const days = this.calculateDays(startDate, endDate);
+  
+    //get car´s daily price 
+    const car = await this.prisma.car.findUnique({ where: { id: carId } });
+    if (!car || !car.status) {
+      throw new BadRequestException('Car is not available');
+    }
+    const dailyPrice = car.dailyPrice;
+    
+    //total amount calculation
+    const totalAmount = (dailyPrice * days) + rentalFee;
   
     //creates order on database
     const order = await this.prisma.order.create({
@@ -20,8 +47,8 @@ export class OrderService {
         startDate,
         endDate,
         cep,
-        uf,
-        city,
+        uf: address.uf,
+        city: address.localidade,
         rentalFee,
         totalAmount,
         statusOrder: 'open', 
@@ -74,7 +101,7 @@ export class OrderService {
       data: { statusOrder: 'cancelled', canceledAt: new Date() },
     });
   }
-    
+
   private convertToResponseDto(order: Order): OrderResponseDto {
     return {
       id: order.id,

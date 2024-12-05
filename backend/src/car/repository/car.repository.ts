@@ -33,10 +33,11 @@ export class CarRepository {
   }
 
   async findAll(
-    skipRegister: number,
+    page: number,
     limit: number,
     filters: CarFilters,
-  ): Promise<{ data: CarEntity[] }> {
+  ): Promise<{ data: CarEntity[]; total: number; totalPages?: number }> {
+    const skip = (page - 1) * limit;
     const where = {
       ...(filters.brand && { brand: { contains: filters.brand } }),
       ...(filters.km && { km: { lte: filters.km } }),
@@ -47,7 +48,7 @@ export class CarRepository {
 
     const data = await this.prisma.car.findMany({
       where,
-      skip: skipRegister,
+      skip,
       take: limit,
       include: {
         items: {
@@ -59,7 +60,14 @@ export class CarRepository {
       },
     });
 
-    return { data };
+    const total = await this.prisma.car.count({ where });
+
+    const totalPages = Math.ceil(total / limit);
+
+    if (totalPages > 1) {
+      return { data, total, totalPages };
+    }
+    return { data, total };
   }
 
   async findOne(id: number): Promise<CarEntity> {

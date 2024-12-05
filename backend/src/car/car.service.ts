@@ -30,10 +30,7 @@ export class CarService {
     if (filters.dailyPrice && filters.dailyPrice < 0) {
       throw new Error('Daily price cannot be negative.');
     }
-
-    const skipRegister = (page - 1) * limit;
-
-    return this.repository.findAll(skipRegister, limit, filters);
+    return this.repository.findAll(page, limit, filters);
   }
 
   findOne(id: number) {

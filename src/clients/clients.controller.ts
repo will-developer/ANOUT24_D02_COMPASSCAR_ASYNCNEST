@@ -12,7 +12,7 @@ import { ClientsService } from "./clients.service";
 import { CreateClientDto } from "./dtos/create-client.dto";
 import { UpdateClientDto } from "./dtos/update-client.dto";
 import { ApiResponse } from "@nestjs/swagger";
-import { IsOptional, IsString } from "class-validator";
+import { query } from "express";
 
 @Controller("clients")
 export class ClientsController {
@@ -32,12 +32,16 @@ export class ClientsController {
 
 	@Get()
 	async getClientByFilters(
+		@Query("page") page: number = 1,
+		@Query("perPage") perPage: number = 10,
 		@Query("name") name?: string,
 		@Query("cpf") cpf?: string,
 		@Query("email") email?: string,
 		@Query("status") status?: string
 	) {
 		return this.clientsService.getClientsByFilters({
+			page,
+			perPage,
 			name,
 			cpf,
 			email,

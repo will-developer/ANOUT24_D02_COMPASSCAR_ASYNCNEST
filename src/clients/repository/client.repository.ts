@@ -2,7 +2,6 @@ import { Injectable } from "@nestjs/common";
 import { CreateClientDto } from "../dtos/create-client.dto";
 import { PrismaService } from "src/prisma/prisma.service";
 import { UpdateClientDto } from "../dtos/update-client.dto";
-import { contains } from "class-validator";
 
 @Injectable()
 export class ClientsRepository {
@@ -63,20 +62,23 @@ export class ClientsRepository {
 		});
 	}
 
-	async getClientsByFilters({ name, cpf, email, status }) {
+	async getClientsByFilters({ page, perPage, name, cpf, email, status }) {
+		const skip = (page - 1) * perPage;
+
 		const clients = await this.prisma.client.findMany({
+			skip,
+			take: perPage,
 			where: {
-				name: { contains: name },
-				email: { contains: email },
-				cpf: { contains: cpf },
-				status:
-					status !== undefined
-						? status === "active"
-							? true
-							: status === "inactive"
-								? false
-								: undefined
-						: undefined,
+				name: name ? { contains: name } : undefined,
+				email: email ? { contains: email } : undefined,
+				cpf: cpf ? { contains: cpf } : undefined,
+				status: status
+					? status === "active"
+						? true
+						: status === "inactive"
+							? false
+							: undefined
+					: undefined,
 			},
 		});
 
@@ -99,6 +101,8 @@ export class ClientsRepository {
 		return {
 			clients: clients,
 			total: totalClients,
+			page,
+			perPage,
 		};
 	}
 }

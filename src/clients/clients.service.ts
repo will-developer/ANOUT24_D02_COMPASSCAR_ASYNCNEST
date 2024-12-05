@@ -94,8 +94,10 @@ export class ClientsService {
 		return this.repository.deleteClient(id);
 	}
 
-	async getClientsByFilters({ name, cpf, email, status }) {
+	async getClientsByFilters({ page, perPage, name, cpf, email, status }) {
 		return this.repository.getClientsByFilters({
+			page,
+			perPage,
 			name,
 			cpf,
 			email,

@@ -24,18 +24,26 @@ export class CarController {
   }
 
   @Get()
-  async findAllWithParams(
-    @Query('page') page: number = 1,
-    @Query('limit') limit: number = 10,
+  async findAll(
+    @Query('page') page?: number,
+    @Query('limit') limit?: number,
     @Query('brand') brand?: string,
     @Query('km') km?: number,
     @Query('year') year?: number,
     @Query('status') status?: boolean,
     @Query('dailyPrice') dailyPrice?: number,
   ) {
-    const filters: CarFilters = { brand, km, year, status, dailyPrice };
+    const filters: CarFilters = {
+      page,
+      limit,
+      brand,
+      km,
+      year,
+      status,
+      dailyPrice,
+    };
 
-    return await this.carService.findAllWithParams(page, limit, filters);
+    return await this.carService.findAll(filters);
   }
 
   @Get(':id')

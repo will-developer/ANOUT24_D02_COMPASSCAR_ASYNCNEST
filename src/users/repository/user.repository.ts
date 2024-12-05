@@ -4,6 +4,7 @@ import { PrismaService } from "src/prisma/prisma.service";
 
 @Injectable()
 export class UserRepository {
+   
     constructor(private prisma: PrismaService) {}
 
     async create(data: Partial<UserEntity>): Promise<UserEntity> {
@@ -14,5 +15,12 @@ export class UserRepository {
         return this.prisma.user.findUnique({ where: { email } });
     }
     
+    async update(id: number, data: Partial<UserEntity>): Promise<UserEntity> {
+        return this.prisma.user.update({ where: { id }, data });
+    }
+    
+    async findById(id: number): Promise<UserEntity | null> {
+        return this.prisma.user.findUnique({ where: { id } });
+    }
     
 }

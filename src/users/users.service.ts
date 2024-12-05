@@ -1,7 +1,8 @@
-import { BadRequestException, Injectable } from '@nestjs/common';
+import { BadRequestException, Injectable, NotFoundException } from '@nestjs/common';
 import * as bcrypt from 'bcrypt';
 import { UserRepository } from './repository/user.repository';
 import { CreateUserDTO } from './dto/create-user.dto';
+import { UpdateUserDTO } from './dto/update-user.dto';
 
 @Injectable()
 export class UsersService {
@@ -22,6 +23,28 @@ export class UsersService {
             status: true,
             createdAt: new Date(),
         });
+
+    }
+
+    async updateUser (id: number, dto: UpdateUserDTO){
+        const user = await this.userRepository.findById(id);
+        if (!user) throw new NotFoundException('user not found.');
+    
+        if (dto.email) {
+          const existingUser = await this.userRepository.findByEmail(dto.email);
+          if (existingUser && existingUser.id !== id && existingUser.status) {
+            throw new BadRequestException('email already registered.');
+          }
+        }
+    
+        if (dto.password) {
+          dto.password = await bcrypt.hash(dto.password, 10);
+        }
+    
+        return this.userRepository.update(id, {
+          ...dto,
+          updatedAt: new Date(),
+        }); 
 
     }
 }

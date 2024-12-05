@@ -56,5 +56,11 @@ export class UsersService {
         return userWithoutPassword;
     }
 
-    
+    async inativateUser (id:number){
+        const user = await this.userRepository.findById(id);
+        if (!user) throw new NotFoundException('user not found.');
+
+        return this.userRepository.update(id, {status: false, inativedAt: new Date()});
+    }
+
 }

@@ -18,6 +18,8 @@ export class ClientsService {
 			data.email
 		);
 
+		const age = this.idade(data.birthDate);
+
 		if (client) {
 			if (client.cpf === data.cpf) {
 				throw new BadRequestException("A client with this CPF already exists.");
@@ -29,6 +31,9 @@ export class ClientsService {
 			}
 		}
 
+		if (!age) {
+			throw new BadRequestException("Must be 18 years or older");
+		}
 		return this.repository.createClient(data);
 	}
 
@@ -87,5 +92,11 @@ export class ClientsService {
 		}
 
 		return this.repository.deleteClient(id);
+	}
+
+	idade(birthDate) {
+		let date = new Date();
+		const age = date.getFullYear() - birthDate.getFullYear();
+		return age > 18;
 	}
 }

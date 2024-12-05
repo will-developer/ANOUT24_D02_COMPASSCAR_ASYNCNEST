@@ -6,11 +6,13 @@ import {
 	Param,
 	Post,
 	Put,
+	Query,
 } from "@nestjs/common";
 import { ClientsService } from "./clients.service";
 import { CreateClientDto } from "./dtos/create-client.dto";
 import { UpdateClientDto } from "./dtos/update-client.dto";
 import { ApiResponse } from "@nestjs/swagger";
+import { IsOptional, IsString } from "class-validator";
 
 @Controller("clients")
 export class ClientsController {
@@ -28,6 +30,21 @@ export class ClientsController {
 		return this.clientsService.updateClient(id, data);
 	}
 
+	@Get()
+	async getClientByFilters(
+		@Query("name") name?: string,
+		@Query("cpf") cpf?: string,
+		@Query("email") email?: string,
+		@Query("status") status?: string
+	) {
+		return this.clientsService.getClientsByFilters({
+			name,
+			cpf,
+			email,
+			status,
+		});
+	}
+
 	@Get(":id")
 	async getClientById(@Param("id") id: number) {
 		return this.clientsService.getClientById(id);
@@ -36,10 +53,5 @@ export class ClientsController {
 	@Delete(":id")
 	async deleteClient(@Param("id") id: number) {
 		return this.clientsService.deleteClient(id);
-	}
-
-	@Get(":id")
-	async idade(@Param("id") id: number) {
-		return this.clientsService.idade(id);
 	}
 }

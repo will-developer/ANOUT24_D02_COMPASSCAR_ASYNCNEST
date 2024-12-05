@@ -94,6 +94,15 @@ export class ClientsService {
 		return this.repository.deleteClient(id);
 	}
 
+	async getClientsByFilters({ name, cpf, email, status }) {
+		return this.repository.getClientsByFilters({
+			name,
+			cpf,
+			email,
+			status,
+		});
+	}
+
 	idade(birthDate) {
 		let date = new Date();
 		const age = date.getFullYear() - birthDate.getFullYear();

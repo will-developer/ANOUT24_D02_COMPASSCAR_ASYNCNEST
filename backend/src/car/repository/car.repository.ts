@@ -32,7 +32,7 @@ export class CarRepository {
     });
   }
 
-  async findAll(
+  async findAllWithParams(
     page: number,
     limit: number,
     filters: CarFilters,

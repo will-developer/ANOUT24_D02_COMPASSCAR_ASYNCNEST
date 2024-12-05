@@ -18,7 +18,11 @@ export class CarService {
     return this.repository.create(createCarDto);
   }
 
-  async findAll(page: number, limit: number = 10, filters: CarFilters) {
+  async findAllWithParams(
+    page: number,
+    limit: number = 10,
+    filters: CarFilters,
+  ) {
     if (page < 1 || limit < 1) {
       throw new Error('Page and limit must be greater than zero.');
     }
@@ -30,7 +34,7 @@ export class CarService {
     if (filters.dailyPrice && filters.dailyPrice < 0) {
       throw new Error('Daily price cannot be negative.');
     }
-    return this.repository.findAll(page, limit, filters);
+    return this.repository.findAllWithParams(page, limit, filters);
   }
 
   findOne(id: number) {

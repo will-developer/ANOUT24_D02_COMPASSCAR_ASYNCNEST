@@ -3,6 +3,7 @@ import { CreateCarDto } from '../dto/create-car.dto';
 import { CarEntity } from '../entities/car.entity';
 import { PrismaService } from '../../prisma/prisma.service';
 import { UpdateCarDto } from '../dto/update-car.dto';
+import { CarFilters } from '../filters/carFilters';
 
 @Injectable()
 export class CarRepository {
@@ -31,8 +32,23 @@ export class CarRepository {
     });
   }
 
-  async findAll(): Promise<CarEntity[]> {
-    return await this.prisma.car.findMany({
+  async findAll(
+    skipRegister: number,
+    limit: number,
+    filters: CarFilters,
+  ): Promise<{ data: CarEntity[] }> {
+    const where = {
+      ...(filters.brand && { brand: { contains: filters.brand } }),
+      ...(filters.km && { km: { lte: filters.km } }),
+      ...(filters.year && { year: { gte: filters.year } }),
+      ...(filters.status !== undefined && { status: filters.status }),
+      ...(filters.dailyPrice && { dailyPrice: { lte: filters.dailyPrice } }),
+    };
+
+    const data = await this.prisma.car.findMany({
+      where,
+      skip: skipRegister,
+      take: limit,
       include: {
         items: {
           select: {
@@ -42,6 +58,8 @@ export class CarRepository {
         },
       },
     });
+
+    return { data };
   }
 
   async findOne(id: number): Promise<CarEntity> {

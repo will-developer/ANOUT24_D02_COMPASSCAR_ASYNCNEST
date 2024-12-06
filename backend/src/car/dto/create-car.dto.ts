@@ -48,12 +48,6 @@ export class CreateCarDto {
   @Min(0.01, { message: 'Daily price must be greater than 0.' })
   dailyPrice: number;
 
-  @IsBoolean()
-  status?: boolean = true;
-
-  @IsDate()
-  inativatedAt?: Date;
-
   @IsArray()
   @ArrayMinSize(1, { message: 'At least one item must be provided.' })
   @ArrayMaxSize(5, { message: 'A maximum of five items must be provided.' })

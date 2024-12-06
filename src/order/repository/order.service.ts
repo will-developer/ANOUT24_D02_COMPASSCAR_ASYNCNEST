@@ -3,14 +3,14 @@ import { PrismaService } from 'prisma/prisma.service';
 import { CreateOrderDto, StatusOrder } from '../dto/create-order.dto';
 import { UpdateOrderDto } from '../dto/update-order.dto';
 import { OrderResponseDto } from '../dto/order-response.dto';
-import { Order } from '@prisma/client';
 import axios from 'axios';
+import { Order } from '@prisma/client';
 
 @Injectable()
 export class OrderService {
   constructor(private prisma: PrismaService) {}
 
-private async getAddressByCep(cep: string) {
+  private async getAddressByCep(cep: string) {
     try {
     const response = await axios.get(`https://viacep.com.br/ws/${cep}/json/`);
     if (response.data.erro) {
@@ -22,7 +22,7 @@ private async getAddressByCep(cep: string) {
   }
 }
 
- private calculateDays(startDate: Date | string, endDate: Date | string): number {
+  private calculateDays(startDate: Date | string, endDate: Date | string): number {
     const start = typeof startDate === 'string' ? new Date(startDate) : startDate;
     const end = typeof endDate === 'string' ? new Date(endDate) : endDate;
   
@@ -30,13 +30,13 @@ private async getAddressByCep(cep: string) {
     return timeDifference / (1000 * 3600 * 24); 
   }  
 
-   async create(createOrderDto: CreateOrderDto): Promise<OrderResponseDto> {
+  async create(createOrderDto: CreateOrderDto): Promise<OrderResponseDto> {
     const { clientId, carId, startDate, endDate, cep } = createOrderDto;
-
- //validates and searches for CEP in the VIA API
+  
+    //validates and searches for CEP in the VIA API
     const address = await this.getAddressByCep(cep);
-
-//rental fee calculation
+  
+    //rental fee calculation
    const rentalFee = parseFloat(address.gia) / 100;
     if (isNaN(rentalFee)) {
       throw new BadRequestException('Invalid rental fee calculated from the address.');
@@ -83,7 +83,7 @@ private async getAddressByCep(cep: string) {
       throw new NotFoundException('Order not found');
     }
 
-//updates order´s fields
+    //updates order´s fields
     let rentalFee = order.rentalFee;
     let totalAmount = order.totalAmount;
     let updatedData: any = { statusOrder: updateOrderDto.statusOrder };
@@ -130,8 +130,8 @@ private async getAddressByCep(cep: string) {
   
     return this.convertToResponseDto(updatedOrder);
   }
-
-    async findAll(cpf: string, status: string, page: number, limit: number): Promise<OrderResponseDto[]> {
+  
+  async findAll(cpf: string, status: string, page: number, limit: number): Promise<OrderResponseDto[]> {
     const orders = await this.prisma.order.findMany({
       where: {
         ...(cpf && { client: { cpf } }),

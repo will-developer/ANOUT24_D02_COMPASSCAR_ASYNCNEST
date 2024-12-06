@@ -1,8 +1,8 @@
-import { Injectable } from "@nestjs/common";
-import { CreateClientDto } from "../dtos/create-client.dto";
-import { PrismaService } from "src/prisma/prisma.service";
-import { UpdateClientDto } from "../dtos/update-client.dto";
-import { Client } from "@prisma/client";
+import { Injectable } from '@nestjs/common';
+import { CreateClientDto } from '../dtos/create-client.dto';
+import { PrismaService } from 'src/prisma/prisma.service';
+import { UpdateClientDto } from '../dtos/update-client.dto';
+import { Client } from '@prisma/client';
 
 @Injectable()
 export class ClientsRepository {
@@ -14,7 +14,7 @@ export class ClientsRepository {
 
   async findClientByCpfOrEmail(
     cpf?: string,
-    email?: string
+    email?: string,
   ): Promise<Client | null> {
     const entryValue: { cpf?: string; email?: string; status: boolean }[] = [];
 
@@ -90,9 +90,9 @@ export class ClientsRepository {
         email: email ? { contains: email } : undefined,
         cpf: cpf ? { contains: cpf } : undefined,
         status: status
-          ? status === "active"
+          ? status === 'active'
             ? true
-            : status === "inactive"
+            : status === 'inactive'
               ? false
               : undefined
           : undefined,
@@ -106,9 +106,9 @@ export class ClientsRepository {
         cpf: { contains: cpf },
         status:
           status !== undefined
-            ? status === "active"
+            ? status === 'active'
               ? true
-              : status === "inactive"
+              : status === 'inactive'
                 ? false
                 : undefined
             : undefined,

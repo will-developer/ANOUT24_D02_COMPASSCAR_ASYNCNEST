@@ -1,9 +1,9 @@
-import { Injectable } from "@nestjs/common";
-import { CreateCarDto } from "../dto/create-car.dto";
-import { CarEntity } from "../entities/car.entity";
-import { PrismaService } from "../../prisma/prisma.service";
-import { UpdateCarDto } from "../dto/update-car.dto";
-import { CarFilters } from "../filters/carFilters";
+import { Injectable } from '@nestjs/common';
+import { CreateCarDto } from '../dto/create-car.dto';
+import { CarEntity } from '../entities/car.entity';
+import { PrismaService } from '../../prisma/prisma.service';
+import { UpdateCarDto } from '../dto/update-car.dto';
+import { CarFilters } from '../filters/carFilters';
 
 @Injectable()
 export class CarRepository {
@@ -32,7 +32,7 @@ export class CarRepository {
   }
 
   async findAll(
-    filters: CarFilters
+    filters: CarFilters,
   ): Promise<{ data: CarEntity[]; total: number; totalPages?: number }> {
     if (isNaN(filters.page)) {
       filters.page = 1;

@@ -3,11 +3,11 @@ import {
   Injectable,
   InternalServerErrorException,
   NotFoundException,
-} from "@nestjs/common";
-import * as bcrypt from "bcrypt";
-import { UserRepository } from "./repository/user.repository";
-import { CreateUserDTO } from "./dto/create-user.dto";
-import { UpdateUserDTO } from "./dto/update-user.dto";
+} from '@nestjs/common';
+import * as bcrypt from 'bcrypt';
+import { UserRepository } from './repository/user.repository';
+import { CreateUserDTO } from './dto/create-user.dto';
+import { UpdateUserDTO } from './dto/update-user.dto';
 
 @Injectable()
 export class UsersService {
@@ -16,7 +16,7 @@ export class UsersService {
   async createUser(dto: CreateUserDTO) {
     const existingUser = await this.userRepository.findByEmail(dto.email);
     if (existingUser && existingUser.status) {
-      throw new BadRequestException("user already registered.");
+      throw new BadRequestException('user already registered.');
     }
 
     const hashedPassword = await bcrypt.hash(dto.password, 10);
@@ -37,12 +37,12 @@ export class UsersService {
 
   async updateUser(id: number, dto: UpdateUserDTO) {
     const user = await this.userRepository.findById(id);
-    if (!user) throw new NotFoundException("user not found.");
+    if (!user) throw new NotFoundException('user not found.');
 
     if (dto.email) {
       const existingUser = await this.userRepository.findByEmail(dto.email);
       if (existingUser && existingUser.id !== id && existingUser.status) {
-        throw new BadRequestException("email already registered.");
+        throw new BadRequestException('email already registered.');
       }
     }
 
@@ -63,7 +63,7 @@ export class UsersService {
   async findAll(
     params: { email?: string; name?: string; status?: boolean },
     page = 1,
-    limit = 10
+    limit = 10,
   ) {
     const skip = (page - 1) * limit;
     try {
@@ -75,7 +75,7 @@ export class UsersService {
 
   async findById(id: number) {
     const user = await this.userRepository.findById(id);
-    if (!user) throw new NotFoundException("user not found.");
+    if (!user) throw new NotFoundException('user not found.');
 
     const { password, ...userWithoutPassword } = user;
 
@@ -88,7 +88,7 @@ export class UsersService {
 
   async inativateUser(id: number) {
     const user = await this.userRepository.findById(id);
-    if (!user) throw new NotFoundException("user not found.");
+    if (!user) throw new NotFoundException('user not found.');
 
     try {
       return this.userRepository.update(id, {

@@ -1,4 +1,4 @@
-import { Car } from "@prisma/client";
+import { Car } from '@prisma/client';
 
 export class CarEntity implements Car {
   id: number;

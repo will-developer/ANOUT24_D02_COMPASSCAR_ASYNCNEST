@@ -11,9 +11,6 @@ export class CarRepository {
 
   async create(createCarDto: CreateCarDto): Promise<CarEntity> {
     const { items, ...carData } = createCarDto;
-    console.log('000000000000000000000', items);
-    console.log(carData);
-
     return this.prisma.car.create({
       data: {
         ...carData,
@@ -98,14 +95,20 @@ export class CarRepository {
     return this.prisma.car.findUnique({ where: { plate } });
   }
 
+  async findCarById(id: number) {
+    return this.prisma.car.findFirst({ where: { id } });
+  }
+
   async update(id: number, updateCarDto: UpdateCarDto): Promise<CarEntity> {
     const { items, ...carData } = updateCarDto;
+
     return this.prisma.car.update({
       where: {
         id,
       },
       data: {
         ...carData,
+        updatedAt: new Date(),
         items: {
           create: items.map((item) => ({
             name: item.name,
@@ -123,7 +126,7 @@ export class CarRepository {
     });
   }
 
-  async delete(id: number, updateCarDto: UpdateCarDto): Promise<CarEntity> {
+  async delete(id: number): Promise<CarEntity> {
     const status = false;
     const inativatedAt = new Date();
     return this.prisma.car.update({

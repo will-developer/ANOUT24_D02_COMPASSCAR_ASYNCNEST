@@ -1,4 +1,8 @@
-import { BadRequestException, Injectable } from '@nestjs/common';
+import {
+  BadRequestException,
+  Injectable,
+  NotFoundException,
+} from '@nestjs/common';
 import { CreateCarDto } from './dto/create-car.dto';
 import { UpdateCarDto } from './dto/update-car.dto';
 import { CarRepository } from './repository/car.repository';
@@ -33,15 +37,26 @@ export class CarService {
     return this.repository.findAll(filters);
   }
 
-  findOne(id: number) {
+  async findOne(id: number) {
+    const findCar = await this.repository.findCarById(id);
+
+    if (!findCar) {
+      throw new NotFoundException('Car not found');
+    }
+
     return this.repository.findOne(id);
   }
 
-  update(id: number, updateCarDto: UpdateCarDto) {
+  async update(id: number, updateCarDto: UpdateCarDto) {
     return this.repository.update(id, updateCarDto);
   }
 
-  remove(id: number, updateCarDto: UpdateCarDto) {
-    return this.repository.delete(id, updateCarDto);
+  async remove(id: number) {
+    const findCar = await this.repository.findCarById(id);
+
+    if (!findCar) {
+      throw new NotFoundException('Car not found');
+    }
+    return this.repository.delete(id);
   }
 }

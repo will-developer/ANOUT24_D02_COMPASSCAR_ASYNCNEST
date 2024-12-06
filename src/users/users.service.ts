@@ -1,4 +1,4 @@
-import { BadRequestException, Injectable, NotFoundException } from '@nestjs/common';
+import { BadRequestException, Injectable, InternalServerErrorException, NotFoundException } from '@nestjs/common';
 import * as bcrypt from 'bcrypt';
 import { UserRepository } from './repository/user.repository';
 import { CreateUserDTO } from './dto/create-user.dto';
@@ -9,21 +9,27 @@ export class UsersService {
     constructor(private userRepository: UserRepository) {}
     
     async createUser(dto: CreateUserDTO){
+
         const existingUser = await this.userRepository.findByEmail(dto.email);
         if (existingUser && existingUser.status) {
-          throw new BadRequestException('e-mail already registered.');
+          throw new BadRequestException('user already registered.');
         }
 
         const hashedPassword = await bcrypt.hash(dto.password, 10);
 
-        return this.userRepository.create({
-            name: dto.name,
-            email: dto.email,
-            password: hashedPassword,
-            status: true,
-            createdAt: new Date(),
-        });
-
+        try {
+            return this.userRepository.create({
+                name: dto.name,
+                email: dto.email,
+                password: hashedPassword,
+                status: true,
+                createdAt: new Date(),
+                updatedAt: new Date(),
+            });
+                
+        } catch (error) {
+            throw new InternalServerErrorException();
+        }
     }
 
     async updateUser (id: number, dto: UpdateUserDTO){
@@ -40,12 +46,15 @@ export class UsersService {
         if (dto.password) {
           dto.password = await bcrypt.hash(dto.password, 10);
         }
-    
-        return this.userRepository.update(id, {
-          ...dto,
-          updatedAt: new Date(),
-        }); 
 
+        try {
+          return this.userRepository.update(id, {
+            ...dto,
+            updatedAt: new Date(),
+          }); 
+        } catch (error) {
+          throw new InternalServerErrorException();
+        }
     }
 
     async findById(id: number){
@@ -53,14 +62,29 @@ export class UsersService {
         if (!user) throw new NotFoundException('user not found.');
 
         const { password, ...userWithoutPassword } = user;
-        return userWithoutPassword;
+
+        try {
+          return userWithoutPassword;
+          
+        } catch (error) {
+          throw new InternalServerErrorException();
+        } 
     }
 
     async inativateUser (id:number){
         const user = await this.userRepository.findById(id);
         if (!user) throw new NotFoundException('user not found.');
 
-        return this.userRepository.update(id, {status: false, inativedAt: new Date()});
+        try {
+          return this.userRepository.update(id, {
+            status: false, 
+            inativedAt: new Date()
+          });
+          
+        } catch (error) {
+          throw new InternalServerErrorException();     
+        }
+        
     }
 
 }

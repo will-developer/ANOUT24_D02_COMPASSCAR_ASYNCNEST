@@ -21,7 +21,7 @@ model User {
   status    Boolean   @default(true)
   createdAt DateTime  @default(now())
   updatedAt DateTime  @updatedAt
-  inativedAt  DateTime?
+  deletedAt DateTime?
 
   @@map("user")
 }

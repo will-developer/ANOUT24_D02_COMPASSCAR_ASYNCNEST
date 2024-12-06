@@ -2,17 +2,22 @@ import { Injectable } from "@nestjs/common";
 import { CreateClientDto } from "../dtos/create-client.dto";
 import { PrismaService } from "src/prisma/prisma.service";
 import { UpdateClientDto } from "../dtos/update-client.dto";
+import { Client } from "@prisma/client";
 
 @Injectable()
 export class ClientsRepository {
 	constructor(private readonly prisma: PrismaService) {}
 
-	async createClient(data: CreateClientDto) {
+	async createClient(data: CreateClientDto): Promise<Client> {
 		return this.prisma.client.create({ data });
 	}
 
-	async findClientByCpfOrEmail(cpf?: string, email?: string) {
-		const entryValue = [];
+	async findClientByCpfOrEmail(
+		cpf?: string,
+		email?: string
+	): Promise<Client | null> {
+		const entryValue: { cpf?: string; email?: string; status: boolean }[] = [];
+
 		if (cpf) {
 			entryValue.push({
 				cpf,
@@ -34,7 +39,7 @@ export class ClientsRepository {
 		});
 	}
 
-	async findClientById(id: number) {
+	async findClientById(id: number): Promise<Client | null> {
 		return this.prisma.client.findUnique({
 			where: {
 				id,
@@ -42,7 +47,7 @@ export class ClientsRepository {
 		});
 	}
 
-	async updateClient(id: number, data: UpdateClientDto) {
+	async updateClient(id: number, data: UpdateClientDto): Promise<Client> {
 		return this.prisma.client.update({
 			where: { id },
 			data: {
@@ -52,7 +57,7 @@ export class ClientsRepository {
 		});
 	}
 
-	async deleteClient(id: number) {
+	async deleteClient(id: number): Promise<Client> {
 		return this.prisma.client.update({
 			where: { id },
 			data: {
@@ -62,7 +67,19 @@ export class ClientsRepository {
 		});
 	}
 
-	async getClientsByFilters({ page, perPage, name, cpf, email, status }) {
+	async getClientsByFilters({
+		page,
+		perPage,
+		name,
+		cpf,
+		email,
+		status,
+	}): Promise<{
+		clients: Client[];
+		total: number;
+		page: number;
+		perPage: number;
+	}> {
 		const skip = (page - 1) * perPage;
 
 		const clients = await this.prisma.client.findMany({

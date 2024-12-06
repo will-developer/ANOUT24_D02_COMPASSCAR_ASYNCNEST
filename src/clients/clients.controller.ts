@@ -12,7 +12,7 @@ import { ClientsService } from "./clients.service";
 import { CreateClientDto } from "./dtos/create-client.dto";
 import { UpdateClientDto } from "./dtos/update-client.dto";
 import { ApiResponse } from "@nestjs/swagger";
-import { query } from "express";
+import { Client } from "@prisma/client";
 
 @Controller("clients")
 export class ClientsController {
@@ -21,12 +21,15 @@ export class ClientsController {
 	@ApiResponse({ status: 400, description: "Dados de entrada inválidos" })
 	@ApiResponse({ status: 201, description: "Cliente criado com sucesso" })
 	@Post()
-	async createClient(@Body() data: CreateClientDto) {
+	async createClient(@Body() data: CreateClientDto): Promise<Client> {
 		return this.clientsService.createClient(data);
 	}
 
 	@Put(":id")
-	async updateClient(@Param("id") id: number, @Body() data: UpdateClientDto) {
+	async updateClient(
+		@Param("id") id: number,
+		@Body() data: UpdateClientDto
+	): Promise<Client> {
 		return this.clientsService.updateClient(id, data);
 	}
 
@@ -38,7 +41,12 @@ export class ClientsController {
 		@Query("cpf") cpf?: string,
 		@Query("email") email?: string,
 		@Query("status") status?: string
-	) {
+	): Promise<{
+		clients: Client[];
+		total: number;
+		page: number;
+		perPage: number;
+	}> {
 		return this.clientsService.getClientsByFilters({
 			page,
 			perPage,
@@ -50,12 +58,13 @@ export class ClientsController {
 	}
 
 	@Get(":id")
-	async getClientById(@Param("id") id: number) {
+	async getClientById(@Param("id") id: number): Promise<Client> {
 		return this.clientsService.getClientById(id);
 	}
 
 	@Delete(":id")
-	async deleteClient(@Param("id") id: number) {
-		return this.clientsService.deleteClient(id);
+	async deleteClient(@Param("id") id: number): Promise<{ message: string }> {
+		await this.clientsService.deleteClient(id);
+		return { message: "Client successfully deleted" };
 	}
 }

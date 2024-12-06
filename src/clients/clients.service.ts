@@ -7,12 +7,13 @@ import {
 import { CreateClientDto } from "./dtos/create-client.dto";
 import { ClientsRepository } from "./repository/client.repository";
 import { UpdateClientDto } from "./dtos/update-client.dto";
+import { Client } from "@prisma/client";
 
 @Injectable()
 export class ClientsService {
 	constructor(private readonly repository: ClientsRepository) {}
 
-	async createClient(data: CreateClientDto) {
+	async createClient(data: CreateClientDto): Promise<Client> {
 		const client = await this.repository.findClientByCpfOrEmail(
 			data.cpf,
 			data.email
@@ -37,7 +38,7 @@ export class ClientsService {
 		return this.repository.createClient(data);
 	}
 
-	async getClientById(id: number) {
+	async getClientById(id: number): Promise<Client | null> {
 		const client = await this.repository.findClientById(id);
 
 		if (!client) {
@@ -47,7 +48,7 @@ export class ClientsService {
 		return client;
 	}
 
-	async updateClient(id: number, data: UpdateClientDto) {
+	async updateClient(id: number, data: UpdateClientDto): Promise<Client> {
 		// check if the client exists in database
 		const client = await this.repository.findClientById(id);
 		if (!client) {
@@ -85,16 +86,28 @@ export class ClientsService {
 	}
 
 	//	TO DO: caso tenha pedidos em aberto, negar a inativação.
-	async deleteClient(id: number) {
+	async deleteClient(id: number): Promise<Client> {
 		const client = await this.repository.findClientById(id);
-		if (!client) {
+		if (client.status === false) {
 			throw new NotFoundException("Client not found");
 		}
 
 		return this.repository.deleteClient(id);
 	}
 
-	async getClientsByFilters({ page, perPage, name, cpf, email, status }) {
+	async getClientsByFilters({
+		page,
+		perPage,
+		name,
+		cpf,
+		email,
+		status,
+	}): Promise<{
+		clients: Client[];
+		total: number;
+		page: number;
+		perPage: number;
+	}> {
 		return this.repository.getClientsByFilters({
 			page,
 			perPage,
@@ -105,7 +118,7 @@ export class ClientsService {
 		});
 	}
 
-	idade(birthDate) {
+	idade(birthDate: Date): boolean {
 		let date = new Date();
 		const age = date.getFullYear() - birthDate.getFullYear();
 		return age > 18;

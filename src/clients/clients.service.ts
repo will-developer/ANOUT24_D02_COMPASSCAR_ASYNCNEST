@@ -88,6 +88,10 @@ export class ClientsService {
 	//	TO DO: caso tenha pedidos em aberto, negar a inativação.
 	async deleteClient(id: number): Promise<Client> {
 		const client = await this.repository.findClientById(id);
+		if (!client) {
+			throw new NotFoundException("Client not found");
+		}
+
 		if (client.status === false) {
 			throw new NotFoundException("Client not found");
 		}

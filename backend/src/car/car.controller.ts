@@ -33,6 +33,14 @@ export class CarController {
     @Query('status') status?: boolean,
     @Query('dailyPrice') dailyPrice?: number,
   ) {
+    if (isNaN(page)) {
+      page = 1;
+    }
+
+    if (isNaN(limit)) {
+      limit = 10;
+    }
+
     const filters: CarFilters = {
       page,
       limit,

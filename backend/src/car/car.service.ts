@@ -19,8 +19,6 @@ export class CarService {
   }
 
   async findAll(filters: CarFilters) {
-    filters.page = 1;
-    filters.limit = 10;
     if (filters.page < 1 || filters.limit < 1) {
       throw new Error('Page and limit must be greater than zero.');
     }

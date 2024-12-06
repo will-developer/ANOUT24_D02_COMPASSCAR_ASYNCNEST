@@ -137,4 +137,6 @@ export class CarRepository {
       },
     });
   }
+
+  //todo: implementar 'Não deve inativar um carro se ele estiver fazendo parte de um pedido aberto ou aprovado.'
 }

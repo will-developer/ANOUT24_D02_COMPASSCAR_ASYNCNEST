@@ -10,6 +10,7 @@ import {
   ArrayMinSize,
   IsArray,
   ArrayMaxSize,
+  IsDate,
 } from 'class-validator';
 import { CreateCarItemDto } from './create-carItem.dto';
 
@@ -49,6 +50,9 @@ export class CreateCarDto {
 
   @IsBoolean()
   status?: boolean = true;
+
+  @IsDate()
+  inativatedAt?: Date;
 
   @IsArray()
   @ArrayMinSize(1, { message: 'At least one item must be provided.' })

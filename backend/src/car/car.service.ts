@@ -41,7 +41,7 @@ export class CarService {
     return this.repository.update(id, updateCarDto);
   }
 
-  remove(id: number) {
-    return this.repository.delete(id);
+  remove(id: number, updateCarDto: UpdateCarDto) {
+    return this.repository.delete(id, updateCarDto);
   }
 }

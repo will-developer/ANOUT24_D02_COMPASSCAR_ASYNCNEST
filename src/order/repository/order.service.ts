@@ -1,4 +1,4 @@
-import { Injectable, NotFoundException, BadRequestException } from '@nestjs/common';
+import { Injectable, NotFoundException, BadRequestException, HttpStatus, HttpException } from '@nestjs/common';
 import { PrismaService } from 'prisma/prisma.service';
 import { CreateOrderDto, StatusOrder } from '../dto/create-order.dto';
 import { UpdateOrderDto } from '../dto/update-order.dto';
@@ -12,13 +12,13 @@ export class OrderService {
 
   private async getAddressByCep(cep: string) {
     try {
-    const response = await axios.get(`https://viacep.com.br/ws/${cep}/json/`);
-    if (response.data.erro) {
-      throw new BadRequestException('Invalid CEP');
-    }
-    return response.data;
-  } catch (error) {
-    throw new BadRequestException('Error while fetching address from VIACEP');
+      const response = await axios.get(`https://viacep.com.br/ws/${cep}/json/`);
+      if (response.data.erro) {
+        throw new HttpException('Invalid CEP', HttpStatus.BAD_REQUEST);
+      }
+      return response.data;
+    } catch (error) {
+      throw new HttpException('Error while fetching address from VIACEP', HttpStatus.BAD_REQUEST);
   }
 }
 
@@ -31,7 +31,8 @@ export class OrderService {
   }  
 
   async create(createOrderDto: CreateOrderDto): Promise<OrderResponseDto> {
-    const { clientId, carId, startDate, endDate, cep } = createOrderDto;
+    try {
+      const { clientId, carId, startDate, endDate, cep } = createOrderDto;
   
     //validates and searches for CEP in the VIA API
     const address = await this.getAddressByCep(cep);
@@ -39,7 +40,7 @@ export class OrderService {
     //rental fee calculation
    const rentalFee = parseFloat(address.gia) / 100;
     if (isNaN(rentalFee)) {
-      throw new BadRequestException('Invalid rental fee calculated from the address.');
+      throw new HttpException('Invalid rental fee calculated from the address.', HttpStatus.BAD_REQUEST);
     }
   
     //number of days calculation
@@ -48,7 +49,7 @@ export class OrderService {
     //get car´s daily price 
     const car = await this.prisma.car.findUnique({ where: { id: carId } });
     if (!car || !car.status) {
-      throw new BadRequestException('Car is not available');
+      throw new HttpException('Car is not available', HttpStatus.BAD_REQUEST);
     }
     const dailyPrice = car.dailyPrice;
     
@@ -74,15 +75,18 @@ export class OrderService {
     });
   
     return this.convertToResponseDto(order);
+  } catch (error) {
+    throw new HttpException(error.message, HttpStatus.INTERNAL_SERVER_ERROR);
   }
+}
   
     async update(id: number, updateOrderDto: UpdateOrderDto): Promise<OrderResponseDto> {
-    const order = await this.prisma.order.findUnique({ where: { id } });
     const car = await this.prisma.car.findUnique({ where: { id: updateOrderDto.carId } });
-    if (!order) {
-      throw new NotFoundException('Order not found');
+    const order = await this.prisma.order.findUnique({ where: { id } });
+     if (!order) {
+      throw new HttpException('Order not found', HttpStatus.NOT_FOUND);
     }
-
+    
     //updates order´s fields
     let rentalFee = order.rentalFee;
     let totalAmount = order.totalAmount;
@@ -105,13 +109,13 @@ export class OrderService {
     //updates order status
     if (updateOrderDto.statusOrder) {
       if (updateOrderDto.statusOrder === 'cancelled' && order.statusOrder !== 'open') {
-        throw new BadRequestException('Only open orders can be canceled');
+        throw new HttpException('Only open orders can be canceled', HttpStatus.BAD_REQUEST);
       }
       if (updateOrderDto.statusOrder === 'approved' && order.statusOrder !== 'open') {
-        throw new BadRequestException('Only open orders can be approved');
+        throw new HttpException('Only open orders can be approved', HttpStatus.BAD_REQUEST);
       }
       if (updateOrderDto.statusOrder === 'closed' && order.statusOrder !== 'approved') {
-        throw new BadRequestException('Only approved orders can be closed');
+        throw new HttpException('Only approved orders can be closed', HttpStatus.BAD_REQUEST);
       }
   
       //calculates late fee if order is closed after close date
@@ -129,8 +133,8 @@ export class OrderService {
     });
   
     return this.convertToResponseDto(updatedOrder);
-  }
-  
+  } 
+    
   async findAll(cpf: string, status: string, page: number, limit: number): Promise<OrderResponseDto[]> {
     const orders = await this.prisma.order.findMany({
       where: {
@@ -146,7 +150,7 @@ export class OrderService {
   async findOne(id: number): Promise<OrderResponseDto> {
     const order = await this.prisma.order.findUnique({ where: { id } });
     if (!order) {
-      throw new NotFoundException('Order not found');
+      throw new HttpException('Order not found', HttpStatus.NOT_FOUND);
     }
     return this.convertToResponseDto(order);
   }
@@ -154,10 +158,10 @@ export class OrderService {
   async cancelOrder(id: number): Promise<void> {
     const order = await this.prisma.order.findUnique({ where: { id } });
     if (!order) {
-      throw new NotFoundException('Order not found');
+      throw new HttpException('Order not found', HttpStatus.NOT_FOUND);
     }
     if (order.statusOrder !== 'open') {
-      throw new BadRequestException('Only open orders can be cancelled');
+      throw new HttpException('Only open orders can be cancelled', HttpStatus.BAD_REQUEST);
     }
 
     await this.prisma.order.update({

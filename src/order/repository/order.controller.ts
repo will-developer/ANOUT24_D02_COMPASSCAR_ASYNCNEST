@@ -1,4 +1,4 @@
-import { Controller, Post, Body, Param, Put, Delete, Query, Get, UsePipes } from '@nestjs/common';
+import { Controller, Post, Body, Param, Put, Delete, Query, Get, UsePipes, HttpStatus, HttpException, Catch } from '@nestjs/common';
 import { OrderService } from './order.service';
 import { PrismaService } from 'prisma/prisma.service';
 import { CreateOrderDto } from '../dto/create-order.dto';
@@ -21,7 +21,11 @@ export class OrderController {
    ValidateClientPipe, 
    ValidateCarPipe)
   async create(@Body() createOrderDto: CreateOrderDto): Promise<OrderResponseDto> {
-  return this.orderService.create(createOrderDto);
+    try {
+      return await this.orderService.create(createOrderDto);
+    } catch (error) {
+      throw new HttpException(error.message, HttpStatus.BAD_REQUEST);
+    }
   }
 
   @Put(':id')
@@ -30,7 +34,11 @@ export class OrderController {
     ValidateClientPipe, 
     ValidateCarPipe)
   async update(@Param('id') id: number, @Body() updateOrderDto: UpdateOrderDto): Promise<OrderResponseDto> {
-  return this.orderService.update(id, updateOrderDto);
+    try {
+      return await this.orderService.update(id, updateOrderDto);
+    } catch (error) {
+      throw new HttpException(error.message, HttpStatus.BAD_REQUEST);
+    }
   }
 
   @Get()
@@ -40,17 +48,28 @@ export class OrderController {
     @Query('page') page: number = 1,
     @Query('limit') limit: number = 10,
   ): Promise<OrderResponseDto[]> {
-    return this.orderService.findAll(cpf, status, page, limit);
+    try {
+      return await this.orderService.findAll(cpf, status, page, limit);
+    } catch (error) {
+      throw new HttpException(error.message, HttpStatus.INTERNAL_SERVER_ERROR);
+    }
   }
 
   @Get(':id')
   async findOne(@Param('id') id: number): Promise<OrderResponseDto> {
-    return this.orderService.findOne(id);
+    try {
+      return await this.orderService.findOne(id);
+    } catch (error) {
+      throw new HttpException(error.message, HttpStatus.NOT_FOUND);
+    }
   }
 
   @Delete(':id')
   async cancelOrder(@Param('id') id: number): Promise<void> {
-    return this.orderService.cancelOrder(id);
-  }
+    try {
+      return await this.orderService.cancelOrder(id);
+    } catch (error) {
+      throw new HttpException(error.message, HttpStatus.BAD_REQUEST);
+    }
 }
-
+}

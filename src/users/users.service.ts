@@ -57,6 +57,15 @@ export class UsersService {
         }
     }
 
+    async findAll(params: { email?: string; name?: string; status?: boolean }, page = 1, limit = 10) {
+      const skip = (page - 1) * limit;
+      try {
+        return this.userRepository.findAll(params, skip, limit);   
+      } catch (error) {
+        throw new InternalServerErrorException();    
+      } 
+    } 
+
     async findById(id: number){
         const user = await this.userRepository.findById(id);
         if (!user) throw new NotFoundException('user not found.');
@@ -70,6 +79,7 @@ export class UsersService {
           throw new InternalServerErrorException();
         } 
     }
+
 
     async inativateUser (id:number){
         const user = await this.userRepository.findById(id);

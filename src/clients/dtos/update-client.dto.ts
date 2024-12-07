@@ -35,7 +35,7 @@ export class UpdateClientDto {
 
 	@ApiProperty({
 		description: "Customer's date of birth",
-		example: "2024-01-01",
+		example: "1994-01-01",
 		required: false,
 	})
 	@IsOptional()

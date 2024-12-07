@@ -16,7 +16,7 @@ import { CreateCarItemDto } from './create-carItem.dto';
 export class CreateCarDto {
   @ApiProperty({
     description: 'Brand of the car. This field is required.',
-    example: 'Toyota',
+    example: 'Jeep',
   })
   @IsString()
   @IsNotEmpty({ message: 'Brand is required.' })
@@ -24,7 +24,7 @@ export class CreateCarDto {
 
   @ApiProperty({
     description: 'Model of the car. This field is required.',
-    example: 'Corolla',
+    example: 'Compass',
   })
   @IsString()
   @IsNotEmpty({ message: 'Model is required.' })

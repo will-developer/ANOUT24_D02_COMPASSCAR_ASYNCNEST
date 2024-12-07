@@ -12,12 +12,14 @@ import {
   ApiResponse,
   ApiForbiddenResponse,
   ApiOperation,
+  ApiTags,
 } from '@nestjs/swagger';
 import { CarService } from './car.service';
 import { CreateCarDto } from './dto/create-car.dto';
 import { UpdateCarDto } from './dto/update-car.dto';
 import { CarFilters } from './filters/carFilters';
 
+@ApiTags('Cars')
 @Controller('car')
 export class CarController {
   constructor(private readonly carService: CarService) {}

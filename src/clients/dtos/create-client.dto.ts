@@ -33,7 +33,7 @@ export class CreateClientDto {
 
   @ApiProperty({
     description: "Customer's e-mail",
-    example: 'jhon@mail.com',
+    example: 'john@mail.com',
   })
   @IsNotEmpty()
   @IsEmail()

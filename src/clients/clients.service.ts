@@ -144,7 +144,7 @@ export class ClientsService {
   }
 
   idade(birthDate: Date): boolean {
-    const date = new Date();
+    let date = new Date();
     const age = date.getFullYear() - birthDate.getFullYear();
     return age > 18;
   }

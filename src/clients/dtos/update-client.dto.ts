@@ -37,7 +37,7 @@ export class UpdateClientDto {
 
   @ApiProperty({
     description: "Customer's e-mail",
-    example: 'jhon@mail.com',
+    example: 'john@mail.com',
     required: false,
   })
   @IsOptional()

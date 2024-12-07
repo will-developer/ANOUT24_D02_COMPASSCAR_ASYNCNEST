@@ -1,6 +1,15 @@
 import { ApiProperty } from '@nestjs/swagger';
 import { Type } from 'class-transformer';
-import { IsEmail, IsNotEmpty, IsString, Matches } from 'class-validator';
+
+import {
+  IsDate,
+  IsEmail,
+  IsNotEmpty,
+  IsString,
+  Matches,
+  MaxLength,
+  MinLength,
+} from 'class-validator';
 
 export class CreateClientDto {
   @ApiProperty({
@@ -29,6 +38,7 @@ export class CreateClientDto {
   })
   @IsNotEmpty()
   @Type(() => Date)
+  @IsDate()
   birthDate: Date;
 
   @ApiProperty({
@@ -41,11 +51,10 @@ export class CreateClientDto {
 
   @ApiProperty({
     description: "Customer's phone number",
-    example: '(11) 12345-6789',
+    example: '11123456789',
   })
   @IsNotEmpty()
-  @Matches(/^\(\d{2}\)\s?\d{5}-\d{4}$/, {
-    message: 'Phone must be in format: (11) 12345-6789',
-  })
+  @MinLength(10)
+  @MaxLength(11)
   phone: string;
 }

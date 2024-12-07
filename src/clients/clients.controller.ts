@@ -15,7 +15,7 @@ import { ApiOperation, ApiResponse } from '@nestjs/swagger';
 import { Client } from '@prisma/client';
 import { ClientFiltersDto } from './dtos/filters-client.dto';
 
-@Controller('clients')
+@Controller('client')
 export class ClientsController {
   constructor(private readonly clientsService: ClientsService) {}
 

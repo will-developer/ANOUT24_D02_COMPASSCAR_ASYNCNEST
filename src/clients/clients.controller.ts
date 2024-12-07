@@ -14,7 +14,7 @@ import { UpdateClientDto } from './dtos/update-client.dto';
 import { ApiResponse } from '@nestjs/swagger';
 import { Client } from '@prisma/client';
 
-@Controller('clients')
+@Controller('client')
 export class ClientsController {
   constructor(private readonly clientsService: ClientsService) {}
 

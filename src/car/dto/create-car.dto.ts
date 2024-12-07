@@ -1,5 +1,4 @@
 import {
-  IsBoolean,
   IsInt,
   IsNotEmpty,
   IsNumber,
@@ -10,7 +9,6 @@ import {
   ArrayMinSize,
   IsArray,
   ArrayMaxSize,
-  IsDate,
 } from 'class-validator';
 import { CreateCarItemDto } from './create-carItem.dto';
 
@@ -25,7 +23,7 @@ export class CreateCarDto {
 
   @IsString()
   @IsNotEmpty()
-  @Matches(/^[A-Z]{3}-[0-9][A-J0-9][0-9]{2}$/, {
+  @Matches(/^[A-Za-z]{3}-[0-9][A-Ja-j0-9][0-9]{2}$/, {
     message: 'The plate must be in the correct format, for example: ABC-1D23.',
   })
   plate: string;

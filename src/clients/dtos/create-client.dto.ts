@@ -1,7 +1,7 @@
 import { ApiProperty } from '@nestjs/swagger';
 import { Type } from 'class-transformer';
 import {
-  IsDate,
+  IsDateString,
   IsEmail,
   IsNotEmpty,
   IsString,
@@ -34,7 +34,7 @@ export class CreateClientDto {
     example: '2024-01-01',
   })
   @IsNotEmpty()
-  @IsDate()
+  @IsDateString()
   @Type(() => Date)
   birthDate: Date;
 

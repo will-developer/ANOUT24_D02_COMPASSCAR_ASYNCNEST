@@ -10,7 +10,7 @@ export class ClientFiltersDto {
 	})
 	@IsOptional()
 	@IsInt()
-	@Transform(({ value }) => parseInt(value, 10)) // Corrigido para 10, base decimal
+	@Transform(({ value }) => parseInt(value, 10))
 	page: number = 1;
 
 	@ApiProperty({
@@ -20,7 +20,7 @@ export class ClientFiltersDto {
 	})
 	@IsOptional()
 	@IsInt()
-	@Transform(({ value }) => parseInt(value, 10)) // Corrigido para 10, base decimal
+	@Transform(({ value }) => parseInt(value, 10))
 	perPage: number = 10;
 
 	@ApiProperty({

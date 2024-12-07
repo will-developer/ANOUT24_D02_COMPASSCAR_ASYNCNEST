@@ -1,12 +1,6 @@
 import { ApiProperty } from "@nestjs/swagger";
 import { Type } from "class-transformer";
-import {
-	IsDate,
-	IsEmail,
-	IsNotEmpty,
-	IsString,
-	Matches,
-} from "class-validator";
+import { IsEmail, IsNotEmpty, IsString, Matches } from "class-validator";
 
 export class CreateClientDto {
 	@ApiProperty({
@@ -54,10 +48,4 @@ export class CreateClientDto {
 		message: "Phone must be in format: (11) 12345-6789",
 	})
 	phone: string;
-}
-function IsBeforeToday(): (
-	target: CreateClientDto,
-	propertyKey: "birthDate"
-) => void {
-	throw new Error("Function not implemented.");
 }

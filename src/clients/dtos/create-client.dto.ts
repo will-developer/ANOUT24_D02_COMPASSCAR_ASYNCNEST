@@ -6,6 +6,7 @@ import {
   IsNotEmpty,
   IsString,
   Matches,
+  MinLength,
 } from 'class-validator';
 
 export class CreateClientDto {
@@ -47,11 +48,9 @@ export class CreateClientDto {
 
   @ApiProperty({
     description: "Customer's phone number",
-    example: '(11) 12345-6789',
+    example: '11123456789',
   })
   @IsNotEmpty()
-  @Matches(/^\(\d{2}\)\s?\d{5}-\d{4}$/, {
-    message: 'Phone must be in format: (11) 12345-6789',
-  })
+  @MinLength(11)
   phone: string;
 }

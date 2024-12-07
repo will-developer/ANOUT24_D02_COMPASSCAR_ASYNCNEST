@@ -11,7 +11,8 @@ export class UpdateUserDTO {
   @IsOptional()
   @MinLength(8)
   @Matches(/^(?=.*[a-zA-Z])(?=.*\d).+$/, {
-    message: 'the password must contain at least 8 characters, including letters and numbers.',
+    message:
+      'the password must contain at least 8 characters, including letters and numbers.',
   })
   password?: string;
 }

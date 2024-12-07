@@ -39,7 +39,6 @@ export class UpdateClientDto {
 		required: false,
 	})
 	@IsOptional()
-	@IsDate()
 	@Type(() => Date)
 	birthDate?: Date;
 

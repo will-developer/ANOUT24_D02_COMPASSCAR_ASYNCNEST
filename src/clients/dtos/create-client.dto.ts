@@ -34,7 +34,6 @@ export class CreateClientDto {
 		example: "2024-01-01",
 	})
 	@IsNotEmpty()
-	@IsDate()
 	@Type(() => Date)
 	birthDate: Date;
 

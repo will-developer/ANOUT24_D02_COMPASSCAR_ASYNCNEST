@@ -1,3 +1,4 @@
+import { Type } from 'class-transformer';
 import {
   IsDateString,
   IsNotEmpty,
@@ -5,6 +6,7 @@ import {
   IsString,
   IsInt,
   IsNumber,
+  IsDate,
 } from 'class-validator';
 
 export enum StatusOrder {
@@ -23,12 +25,14 @@ export class CreateOrderDto {
   @IsNotEmpty()
   carId: number;
 
-  @IsDateString()
   @IsNotEmpty()
+  @Type(() => Date)
+  @IsDate()
   startDate: Date;
 
-  @IsDateString()
   @IsNotEmpty()
+  @Type(() => Date)
+  @IsDate()
   endDate: Date;
 
   @IsString()

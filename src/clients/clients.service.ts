@@ -84,7 +84,6 @@ export class ClientsService {
 
     return updatedClient;
   }
-
   //	TO DO: caso tenha pedidos em aberto, negar a inativação.
   async deleteClient(id: number): Promise<Client> {
     const client = await this.repository.findClientById(id);

@@ -1,17 +1,11 @@
 import { ApiProperty } from '@nestjs/swagger';
 import { Type } from 'class-transformer';
-import {
-  IsDate,
-  IsEmail,
-  IsNotEmpty,
-  IsString,
-  Matches,
-} from 'class-validator';
+import { IsEmail, IsNotEmpty, IsString, Matches } from 'class-validator';
 
 export class CreateClientDto {
   @ApiProperty({
     description: "Customer's full name",
-    example: 'Jhon Doe',
+    example: 'John Doe',
   })
   @IsNotEmpty()
   @IsString()
@@ -24,22 +18,22 @@ export class CreateClientDto {
   @IsNotEmpty()
   @IsString()
   @Matches(/^\d{3}(\.\d{3}){2}-\d{2}$|^\d{11}$/, {
-    message: 'CPF must be 11 digits',
+    message:
+      'CPF must have 11 digits and be in the following formats: 12345678910 or 123.456.789-10',
   })
   cpf: string;
 
   @ApiProperty({
     description: "Customer's date of birth",
-    example: '2024-01-01',
+    example: '1994-01-01',
   })
   @IsNotEmpty()
-  @IsDate()
   @Type(() => Date)
   birthDate: Date;
 
   @ApiProperty({
     description: "Customer's e-mail",
-    example: 'jhon@mail.com',
+    example: 'john@mail.com',
   })
   @IsNotEmpty()
   @IsEmail()

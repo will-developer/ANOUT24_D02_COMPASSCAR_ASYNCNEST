@@ -10,10 +10,8 @@ import {
   UsePipes,
   HttpStatus,
   HttpException,
-  Catch,
 } from '@nestjs/common';
 import { OrderService } from './order.service';
-import { PrismaService } from 'prisma/prisma.service';
 import { CreateOrderDto } from '../dto/create-order.dto';
 import { UpdateOrderDto } from '../dto/update-order.dto';
 import { OrderResponseDto } from '../dto/order-response.dto';
@@ -23,10 +21,7 @@ import { ValidateCarPipe } from '../validation/validate-car.pipe';
 
 @Controller('orders')
 export class OrderController {
-  constructor(
-    private readonly orderService: OrderService,
-    private readonly prisma: PrismaService,
-  ) {}
+  constructor(private readonly orderService: OrderService) {}
 
   @Post()
   @UsePipes(ValidateDatePipe, ValidateClientPipe, ValidateCarPipe)

@@ -60,18 +60,6 @@ export class CreateOrderDto {
   @IsString()
   statusOrder: StatusOrder;
 
-  @IsDateString()
-  @IsOptional()
-  createdAt?: Date;
-
-  @IsDateString()
-  @IsOptional()
-  updatedAt?: Date;
-
-  @IsDateString()
-  @IsOptional()
-  canceledAt?: Date;
-
   @IsNumber()
   @IsOptional()
   totalAmount?: number;

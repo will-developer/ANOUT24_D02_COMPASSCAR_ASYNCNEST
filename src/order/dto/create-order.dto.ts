@@ -1,4 +1,12 @@
-import { IsDateString, IsNotEmpty, IsOptional, IsString, IsInt, IsNumber, IsEnum } from 'class-validator';
+import {
+  IsDateString,
+  IsNotEmpty,
+  IsOptional,
+  IsString,
+  IsInt,
+  IsNumber,
+  IsEnum,
+} from 'class-validator';
 
 export enum StatusOrder {
   OPEN = 'open',
@@ -68,4 +76,3 @@ export class CreateOrderDto {
   @IsOptional()
   totalAmount?: number;
 }
-

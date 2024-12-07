@@ -1,4 +1,17 @@
-import { Controller, Post, Body, Param, Put, Delete, Query, Get, UsePipes, HttpStatus, HttpException, Catch } from '@nestjs/common';
+import {
+  Controller,
+  Post,
+  Body,
+  Param,
+  Put,
+  Delete,
+  Query,
+  Get,
+  UsePipes,
+  HttpStatus,
+  HttpException,
+  Catch,
+} from '@nestjs/common';
 import { OrderService } from './order.service';
 import { PrismaService } from 'prisma/prisma.service';
 import { CreateOrderDto } from '../dto/create-order.dto';
@@ -12,15 +25,14 @@ import { ValidateCarPipe } from '../validation/validate-car.pipe';
 export class OrderController {
   constructor(
     private readonly orderService: OrderService,
-    private readonly prisma: PrismaService
+    private readonly prisma: PrismaService,
   ) {}
 
   @Post()
-  @UsePipes(
-   ValidateDatePipe, 
-   ValidateClientPipe, 
-   ValidateCarPipe)
-  async create(@Body() createOrderDto: CreateOrderDto): Promise<OrderResponseDto> {
+  @UsePipes(ValidateDatePipe, ValidateClientPipe, ValidateCarPipe)
+  async create(
+    @Body() createOrderDto: CreateOrderDto,
+  ): Promise<OrderResponseDto> {
     try {
       return await this.orderService.create(createOrderDto);
     } catch (error) {
@@ -29,11 +41,11 @@ export class OrderController {
   }
 
   @Put(':id')
-  @UsePipes(
-    ValidateDatePipe, 
-    ValidateClientPipe, 
-    ValidateCarPipe)
-  async update(@Param('id') id: number, @Body() updateOrderDto: UpdateOrderDto): Promise<OrderResponseDto> {
+  @UsePipes(ValidateDatePipe, ValidateClientPipe, ValidateCarPipe)
+  async update(
+    @Param('id') id: number,
+    @Body() updateOrderDto: UpdateOrderDto,
+  ): Promise<OrderResponseDto> {
     try {
       return await this.orderService.update(id, updateOrderDto);
     } catch (error) {
@@ -71,5 +83,5 @@ export class OrderController {
     } catch (error) {
       throw new HttpException(error.message, HttpStatus.BAD_REQUEST);
     }
-}
+  }
 }

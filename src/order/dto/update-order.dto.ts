@@ -1,12 +1,19 @@
-import { IsString, IsInt, IsDateString, IsOptional, IsNumber, IsEnum } from 'class-validator';
+import {
+  IsString,
+  IsInt,
+  IsDateString,
+  IsOptional,
+  IsNumber,
+  IsEnum,
+} from 'class-validator';
 
 export enum StatusOrder {
-    OPEN = 'open',
-    CANCELLED = 'cancelled',
-    APPROVED = 'approved',
-    CLOSED = 'closed',
-  }
-  
+  OPEN = 'open',
+  CANCELLED = 'cancelled',
+  APPROVED = 'approved',
+  CLOSED = 'closed',
+}
+
 export class UpdateOrderDto {
   @IsInt()
   @IsOptional()

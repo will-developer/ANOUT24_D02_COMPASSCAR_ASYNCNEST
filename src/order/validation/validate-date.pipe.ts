@@ -1,4 +1,9 @@
-import { PipeTransform, Injectable, BadRequestException, HttpStatus } from '@nestjs/common';
+import {
+  PipeTransform,
+  Injectable,
+  BadRequestException,
+  HttpStatus,
+} from '@nestjs/common';
 import { ArgumentMetadata } from '@nestjs/common/interfaces';
 
 @Injectable()
@@ -17,7 +22,7 @@ export class ValidateDatePipe implements PipeTransform {
           statusCode: HttpStatus.BAD_REQUEST,
           message: `The ${data} cannot be in the past.`,
           error: 'Bad Request',
-        })
+        });
       }
 
       // Validates endDate should not be before startDate or in the past

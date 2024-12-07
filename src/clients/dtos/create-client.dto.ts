@@ -1,14 +1,15 @@
-import { ApiProperty } from "@nestjs/swagger";
-import { Type } from "class-transformer";
+import { ApiProperty } from '@nestjs/swagger';
+import { Type } from 'class-transformer';
 import {
-	IsDate,
-	IsEmail,
-	IsNotEmpty,
-	IsString,
-	Matches,
-} from "class-validator";
+  IsDate,
+  IsEmail,
+  IsNotEmpty,
+  IsString,
+  Matches,
+} from 'class-validator';
 
 export class CreateClientDto {
+
 	@ApiProperty({
 		description: "Customer's full name",
 		example: "John Doe",
@@ -37,27 +38,22 @@ export class CreateClientDto {
 	@Type(() => Date)
 	birthDate: Date;
 
-	@ApiProperty({
-		description: "Customer's e-mail",
-		example: "jhon@mail.com",
-	})
-	@IsNotEmpty()
-	@IsEmail()
-	email: string;
 
-	@ApiProperty({
-		description: "Customer's phone number",
-		example: "(11) 12345-6789",
-	})
-	@IsNotEmpty()
-	@Matches(/^\(\d{2}\)\s?\d{5}-\d{4}$/, {
-		message: "Phone must be in format: (11) 12345-6789",
-	})
-	phone: string;
-}
-function IsBeforeToday(): (
-	target: CreateClientDto,
-	propertyKey: "birthDate"
-) => void {
-	throw new Error("Function not implemented.");
+  @ApiProperty({
+    description: "Customer's e-mail",
+    example: 'john@mail.com',
+  })
+  @IsNotEmpty()
+  @IsEmail()
+  email: string;
+
+  @ApiProperty({
+    description: "Customer's phone number",
+    example: '(11) 12345-6789',
+  })
+  @IsNotEmpty()
+  @Matches(/^\(\d{2}\)\s?\d{5}-\d{4}$/, {
+    message: 'Phone must be in format: (11) 12345-6789',
+  })
+  phone: string;
 }

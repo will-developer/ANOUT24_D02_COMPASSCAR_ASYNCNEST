@@ -1,13 +1,13 @@
 import {
-	BadRequestException,
-	ConflictException,
-	Injectable,
-	NotFoundException,
-} from "@nestjs/common";
-import { CreateClientDto } from "./dtos/create-client.dto";
-import { ClientsRepository } from "./repository/client.repository";
-import { UpdateClientDto } from "./dtos/update-client.dto";
-import { Client } from "@prisma/client";
+  BadRequestException,
+  ConflictException,
+  Injectable,
+  NotFoundException,
+} from '@nestjs/common';
+import { CreateClientDto } from './dtos/create-client.dto';
+import { ClientsRepository } from './repository/client.repository';
+import { UpdateClientDto } from './dtos/update-client.dto';
+import { Client } from '@prisma/client';
 
 @Injectable()
 export class ClientsService {

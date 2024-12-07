@@ -15,9 +15,9 @@ import { ApiOperation, ApiQuery, ApiResponse } from "@nestjs/swagger";
 import { Client } from "@prisma/client";
 import { ClientFiltersDto } from "./dtos/filters-client.dto";
 
-@Controller("clients")
+@Controller('clients')
 export class ClientsController {
-	constructor(private readonly clientsService: ClientsService) {}
+  constructor(private readonly clientsService: ClientsService) {}
 
 	// CREATE CLIENT
 	@ApiOperation({ summary: "Create a Client" })
@@ -109,5 +109,5 @@ export class ClientsController {
 	async deleteClient(@Param("id") id: number): Promise<{ message: string }> {
 		await this.clientsService.deleteClient(id);
 		return { message: "Client successfully deleted" };
-	}
+	} 
 }

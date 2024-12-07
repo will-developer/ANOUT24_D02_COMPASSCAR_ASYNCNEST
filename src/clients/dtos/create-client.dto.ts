@@ -6,6 +6,7 @@ import {
   IsNotEmpty,
   IsString,
   Matches,
+  MaxLength,
   MinLength,
 } from 'class-validator';
 
@@ -51,6 +52,7 @@ export class CreateClientDto {
     example: '11123456789',
   })
   @IsNotEmpty()
-  @MinLength(11)
+  @MinLength(10)
+  @MaxLength(11)
   phone: string;
 }

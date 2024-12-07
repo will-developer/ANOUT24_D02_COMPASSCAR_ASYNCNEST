@@ -5,7 +5,6 @@ import {
   IsString,
   IsInt,
   IsNumber,
-  IsEnum,
 } from 'class-validator';
 
 export enum StatusOrder {
@@ -55,10 +54,6 @@ export class CreateOrderDto {
   @IsNumber()
   @IsOptional()
   lateFee?: number;
-
-  @IsEnum(StatusOrder)
-  @IsString()
-  statusOrder: StatusOrder;
 
   @IsNumber()
   @IsOptional()

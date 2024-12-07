@@ -112,7 +112,22 @@ export class ClientsService {
 		page: number;
 		perPage: number;
 	}> {
-		return this.repository.getClientsByFilters({
+		const isFiltering = name || cpf || email || status;
+
+		if (!isFiltering) {
+			const result = await this.repository.getClientsByFilters({
+				page,
+				perPage,
+				name: undefined,
+				cpf: undefined,
+				email: undefined,
+				status: undefined,
+			});
+
+			return result;
+		}
+
+		const result = await this.repository.getClientsByFilters({
 			page,
 			perPage,
 			name,
@@ -120,6 +135,12 @@ export class ClientsService {
 			email,
 			status,
 		});
+
+		if (!result || result.clients.length === 0) {
+			throw new NotFoundException("No clients found with these requirements");
+		}
+
+		return result;
 	}
 
 	idade(birthDate: Date): boolean {

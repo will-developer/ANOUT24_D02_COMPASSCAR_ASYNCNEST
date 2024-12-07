@@ -14,7 +14,7 @@ import {
 export class UpdateClientDto {
 	@ApiProperty({
 		description: "Customer's full name",
-		example: "Jhon Doe",
+		example: "John Doe",
 		required: false,
 	})
 	@IsOptional()

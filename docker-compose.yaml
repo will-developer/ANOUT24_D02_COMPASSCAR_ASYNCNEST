@@ -6,8 +6,8 @@ services:
     ports:
       - "3000:3000"
     volumes:
-      - .:/usr/src/app
-      - /usr/src/app/node_modules
+    - .:/usr/src/app
+    #- /usr/src/app/node_modules
     environment:
       DATABASE_URL: "mysql://root:root@db:3306/database"
       NODE_ENV: development

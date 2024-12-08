@@ -11,6 +11,6 @@ export class CarEntity implements Car {
   status: boolean;
   createdAt: Date;
   updatedAt: Date;
-  inativatedAt: Date;
+  inactivatedAt: Date;
 }
 //todo: precisará integrar junto com a entidade de Orders

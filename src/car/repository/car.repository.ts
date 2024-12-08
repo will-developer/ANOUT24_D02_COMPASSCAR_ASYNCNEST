@@ -128,12 +128,12 @@ export class CarRepository {
 
   async delete(id: number): Promise<CarEntity> {
     const status = false;
-    const inativatedAt = new Date();
+    const inactivatedAt = new Date();
     return this.prisma.car.update({
       where: { id },
       data: {
         status,
-        inativatedAt,
+        inactivatedAt,
       },
     });
   }

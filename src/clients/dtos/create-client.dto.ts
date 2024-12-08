@@ -2,14 +2,15 @@ import { ApiProperty } from '@nestjs/swagger';
 import { Type } from 'class-transformer';
 
 import {
-  IsDate,
   IsEmail,
   IsNotEmpty,
   IsString,
-  Matches,
+  Length,
   MaxLength,
   MinLength,
+  Validate,
 } from 'class-validator';
+import { IsCpf } from '../decorators/is-cpf.decorator';
 
 export class CreateClientDto {
   @ApiProperty({
@@ -26,10 +27,8 @@ export class CreateClientDto {
   })
   @IsNotEmpty()
   @IsString()
-  @Matches(/^\d{3}(\.\d{3}){2}-\d{2}$|^\d{11}$/, {
-    message:
-      'CPF must have 11 digits and be in the following formats: 12345678910 or 123.456.789-10',
-  })
+  @Length(11, 11, { message: 'CPF must contain exactly 11 digits' })
+  @Validate(IsCpf)
   cpf: string;
 
   @ApiProperty({
@@ -38,7 +37,6 @@ export class CreateClientDto {
   })
   @IsNotEmpty()
   @Type(() => Date)
-  @IsDate()
   birthDate: Date;
 
   @ApiProperty({

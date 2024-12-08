@@ -1,4 +1,4 @@
-import { BadRequestException, Injectable, InternalServerErrorException, NotFoundException } from '@nestjs/common';
+import { BadRequestException, ConflictException, Injectable, InternalServerErrorException, NotFoundException } from '@nestjs/common';
 import * as bcrypt from 'bcrypt';
 import { UserRepository } from './repository/user.repository';
 import { CreateUserDTO } from './dto/create-user.dto';
@@ -12,7 +12,7 @@ export class UsersService {
 
         const existingUser = await this.userRepository.findByEmail(dto.email);
         if (existingUser && existingUser.status) {
-          throw new BadRequestException('user already registered.');
+          throw new ConflictException('user already registered.');
         }
 
         const hashedPassword = await bcrypt.hash(dto.password, 10);
@@ -28,7 +28,7 @@ export class UsersService {
             });
                 
         } catch (error) {
-            throw new InternalServerErrorException();
+            return error
         }
     }
 

@@ -1,5 +1,7 @@
+
 import {
   BadRequestException,
+  ConflictException,
   Injectable,
   InternalServerErrorException,
   NotFoundException,
@@ -16,7 +18,7 @@ export class UsersService {
   async createUser(dto: CreateUserDTO) {
     const existingUser = await this.userRepository.findByEmail(dto.email);
     if (existingUser && existingUser.status) {
-      throw new BadRequestException('user already registered.');
+      throw new ConflictException('user already registered.');
     }
 
     const hashedPassword = await bcrypt.hash(dto.password, 10);
@@ -77,7 +79,8 @@ export class UsersService {
     const user = await this.userRepository.findById(id);
     if (!user) throw new NotFoundException('user not found.');
 
-    const { password, ...userWithoutPassword } = user;
+    const userWithoutPassword = { ...user };
+    delete userWithoutPassword.password;
 
     try {
       return userWithoutPassword;

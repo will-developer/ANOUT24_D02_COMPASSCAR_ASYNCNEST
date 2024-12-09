@@ -77,7 +77,7 @@ describe('OrderController (E2E)', () => {
         expect(res.body).toHaveProperty('id');
         expect(res.body.statusOrder).toBe('open');
       });
-  })
+  });
 
   it('should fail when creating order with invalid CEP', async () => {
     const createOrderDto = {
@@ -129,6 +129,30 @@ describe('OrderController (E2E)', () => {
       .expect(400)
       .expect((res) => {
         expect(res.body.message).toBe('Car is not active.');
+      });
+  });
+
+  it('should list orders with pagination', async () => {
+    mockPrismaService.order.findMany.mockResolvedValue([
+      {
+        id: 1,
+        clientId: 1,
+        carId: 1,
+        startDate: new Date(),
+        endDate: new Date(),
+        cep: '01310-930',
+        rentalFee: 10.04,
+        totalAmount: 100,
+        statusOrder: 'open',
+      },
+    ]);
+
+    return request(app.getHttpServer())
+      .get('/orders')
+      .query({ page: 1, limit: 10 })
+      .expect(200)
+      .expect((res) => {
+        expect(res.body.length).toBeGreaterThan(0);
       });
   });
 });

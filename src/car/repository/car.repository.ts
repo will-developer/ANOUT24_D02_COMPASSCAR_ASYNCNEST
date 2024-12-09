@@ -127,6 +127,16 @@ export class CarRepository {
   }
 
   async delete(id: number): Promise<{ message: string }> {
+    const existCar = await this.prisma.car.findFirst({
+      where: { id },
+    });
+
+    if (!existCar.status) {
+      return {
+        message: `This car has already been deleted`,
+      };
+    }
+
     const status = false;
     const inactivatedAt = new Date();
 
@@ -138,9 +148,8 @@ export class CarRepository {
       },
     });
 
-    const result = `The car with id: ${id} was deleted with success`;
-    return { message: result };
+    return {
+      message: `The car with the plate: ${existCar.plate} has been deleted`,
+    };
   }
-
-  //todo: implementar 'Não deve inativar um carro se ele estiver fazendo parte de um pedido aberto ou aprovado.'
 }

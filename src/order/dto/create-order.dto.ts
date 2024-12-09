@@ -7,6 +7,7 @@ import {
   IsInt,
   IsNumber,
   IsDate,
+  Matches,
 } from 'class-validator';
 
 export enum StatusOrder {
@@ -37,6 +38,7 @@ export class CreateOrderDto {
 
   @IsString()
   @IsNotEmpty()
+  @Matches(/^\d{5}-\d{3}$/, { message: 'CEP must be in the format XXXXX-XXX' })
   cep: string;
 
   @IsString()

@@ -8,10 +8,14 @@ import { CreateClientDto } from './dtos/create-client.dto';
 import { ClientsRepository } from './repository/client.repository';
 import { UpdateClientDto } from './dtos/update-client.dto';
 import { Client } from '@prisma/client';
+import { OrderService } from '../order/repository/order.service';
 
 @Injectable()
 export class ClientsService {
-  constructor(private readonly repository: ClientsRepository) {}
+  constructor(
+    private readonly repository: ClientsRepository,
+    private readonly orderService: OrderService,
+  ) {}
 
   async createClient(data: CreateClientDto): Promise<Client> {
     const client = await this.repository.findClientByCpfOrEmail(
@@ -84,6 +88,7 @@ export class ClientsService {
 
     return updatedClient;
   }
+
   //	TO DO: caso tenha pedidos em aberto, negar a inativação.
   async deleteClient(id: number): Promise<Client> {
     const client = await this.repository.findClientById(id);
@@ -94,6 +99,19 @@ export class ClientsService {
     if (client.status === false) {
       throw new NotFoundException('Client not found');
     }
+
+    const getAllOrders = await this.orderService.getAllOrders();
+
+    getAllOrders.forEach((order) => {
+      if (
+        (order.clientId === id && order.statusOrder === 'open') ||
+        order.statusOrder === 'approved'
+      ) {
+        throw new BadRequestException(
+          'It is not possible to delete this client because it is part of an open/approved order',
+        );
+      }
+    });
 
     return this.repository.deleteClient(id);
   }

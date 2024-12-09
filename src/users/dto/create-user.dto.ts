@@ -28,6 +28,7 @@ export class CreateUserDTO {
 
   @IsString()
   @MinLength(8)
+  @IsNotEmpty()
   @Matches(/^(?=.*[a-zA-Z])(?=.*\d).+$/, {
     message:
       'password must contain at least 8 characters, including letters and numbers',

@@ -126,10 +126,6 @@ export class CarRepository {
     });
   }
 
-  async getAllOrders() {
-    return await this.prisma.order.findMany();
-  }
-
   async delete(id: number): Promise<{ message: string }> {
     const status = false;
     const inactivatedAt = new Date();

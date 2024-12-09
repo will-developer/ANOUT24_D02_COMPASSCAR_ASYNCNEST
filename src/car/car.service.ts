@@ -7,10 +7,14 @@ import { CreateCarDto } from './dto/create-car.dto';
 import { UpdateCarDto } from './dto/update-car.dto';
 import { CarRepository } from './repository/car.repository';
 import { CarFilters } from './filters/carFilters';
+import { OrderService } from '../order/repository/order.service';
 
 @Injectable()
 export class CarService {
-  constructor(private readonly repository: CarRepository) {}
+  constructor(
+    private readonly repository: CarRepository,
+    private readonly orderService: OrderService,
+  ) {}
   //todo: verificar se os erros estão certos
   async create(createCarDto: CreateCarDto) {
     const existCar = await this.repository.findByPlate(createCarDto.plate);
@@ -64,7 +68,7 @@ export class CarService {
       throw new BadRequestException('Car not found');
     }
 
-    const getAllOrders = await this.repository.getAllOrders();
+    const getAllOrders = await this.orderService.getAllOrders();
 
     getAllOrders.forEach((order) => {
       if (

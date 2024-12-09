@@ -155,4 +155,68 @@ describe('OrderController (E2E)', () => {
         expect(res.body.length).toBeGreaterThan(0);
       });
   });
+
+  it('should update an order successfully', async () => {
+    const updateOrderDto = {
+      carId: 1,
+      startDate: new Date(),
+      endDate: new Date(),
+      cep: '01310-930',
+      statusOrder: 'approved',
+    };
+
+    mockPrismaService.order.findUnique.mockResolvedValue({
+      id: 1,
+      clientId: 1,
+      carId: 1,
+      startDate: new Date(),
+      endDate: new Date(),
+      cep: '01310-930',
+      statusOrder: 'open',
+    });
+
+    mockPrismaService.car.findUnique.mockResolvedValue({
+      id: 1,
+      dailyPrice: 100,
+      status: true,
+    });
+
+    axiosMock.get.mockResolvedValue({
+      data: {
+        localidade: 'São Paulo',
+        uf: 'SP',
+        gia: '1004',
+      },
+    });
+
+    mockPrismaService.order.update.mockResolvedValue({
+      id: 1,
+      statusOrder: 'approved',
+      ...updateOrderDto,
+    });
+
+    return request(app.getHttpServer())
+      .put('/orders/1')
+      .send(updateOrderDto)
+      .expect(200)
+      .expect((res) => {
+        expect(res.body.statusOrder).toBe('approved');
+      });
+  });
+
+  it('should fail when trying to cancel a non-open order', async () => {
+    mockPrismaService.order.findUnique.mockResolvedValue({
+      id: 1,
+      statusOrder: 'approved',
+    });
+
+    await request(app.getHttpServer()).delete('/orders/1').expect(400).expect({
+      statusCode: 400,
+      message: 'Only open orders can be cancelled',
+    });
+  });
+
+  afterAll(async () => {
+    await app.close();
+  });
 });

@@ -126,16 +126,24 @@ export class CarRepository {
     });
   }
 
-  async delete(id: number): Promise<CarEntity> {
+  async getAllOrders() {
+    return await this.prisma.order.findMany();
+  }
+
+  async delete(id: number): Promise<{ message: string }> {
     const status = false;
     const inactivatedAt = new Date();
-    return this.prisma.car.update({
+
+    await this.prisma.car.update({
       where: { id },
       data: {
         status,
         inactivatedAt,
       },
     });
+
+    const result = `The car with id: ${id} was deleted with success`;
+    return { message: result };
   }
 
   //todo: implementar 'Não deve inativar um carro se ele estiver fazendo parte de um pedido aberto ou aprovado.'

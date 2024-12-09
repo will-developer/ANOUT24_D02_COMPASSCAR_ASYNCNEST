@@ -61,8 +61,22 @@ export class CarService {
     const findCar = await this.repository.findCarById(id);
 
     if (!findCar) {
-      throw new NotFoundException('Car not found');
+      throw new BadRequestException('Car not found');
     }
+
+    const getAllOrders = await this.repository.getAllOrders();
+
+    getAllOrders.forEach((order) => {
+      if (
+        (order.carId === id && order.statusOrder === 'open') ||
+        order.statusOrder === 'approved'
+      ) {
+        throw new BadRequestException(
+          'It is not possible to delete this car because it is part of an open order, see the order table',
+        );
+      }
+    });
+
     return this.repository.delete(id);
   }
 }

@@ -18,9 +18,17 @@ export class CarService {
   //todo: verificar se os erros estão certos
   async create(createCarDto: CreateCarDto) {
     const existCar = await this.repository.findByPlate(createCarDto.plate);
-
     if (existCar) {
       throw new BadRequestException('A car with this plate already exist');
+    }
+
+    const arrItems = createCarDto.items;
+    const uniqueArrItems = new Set(arrItems.map((items) => items.name));
+
+    if (uniqueArrItems.size !== arrItems.length) {
+      throw new NotFoundException(
+        'Items and accessories cannot be duplicated.',
+      );
     }
 
     return this.repository.create(createCarDto);

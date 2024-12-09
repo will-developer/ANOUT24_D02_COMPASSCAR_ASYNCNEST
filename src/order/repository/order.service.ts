@@ -1,11 +1,5 @@
-import {
-  Injectable,
-  NotFoundException,
-  BadRequestException,
-  HttpStatus,
-  HttpException,
-} from '@nestjs/common';
-import { PrismaService } from 'prisma/prisma.service';
+import { Injectable, HttpStatus, HttpException } from '@nestjs/common';
+import { PrismaService } from 'src/prisma/prisma.service';
 import { CreateOrderDto, StatusOrder } from '../dto/create-order.dto';
 import { UpdateOrderDto } from '../dto/update-order.dto';
 import { OrderResponseDto } from '../dto/order-response.dto';

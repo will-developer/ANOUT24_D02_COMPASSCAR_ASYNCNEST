@@ -5,6 +5,7 @@ import {
   IsOptional,
   IsNumber,
   IsEnum,
+  Matches,
 } from 'class-validator';
 
 export enum StatusOrder {
@@ -33,6 +34,7 @@ export class UpdateOrderDto {
 
   @IsString()
   @IsOptional()
+  @Matches(/^\d{5}-\d{3}$/, { message: 'CEP must be in the format XXXXX-XXX' })
   cep?: string;
 
   @IsOptional()

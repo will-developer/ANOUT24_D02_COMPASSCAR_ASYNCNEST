@@ -16,5 +16,6 @@ import { ValidateCarPipe } from '../validation/validate-car.pipe';
     ValidateCarPipe,
     ValidateDatePipe,
   ],
+  exports: [OrderService],
 })
 export class OrderModule {}

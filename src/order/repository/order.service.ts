@@ -1,10 +1,4 @@
-import {
-  Injectable,
-  NotFoundException,
-  BadRequestException,
-  HttpStatus,
-  HttpException,
-} from '@nestjs/common';
+import { Injectable, HttpStatus, HttpException } from '@nestjs/common';
 import { PrismaService } from 'prisma/prisma.service';
 import { CreateOrderDto, StatusOrder } from '../dto/create-order.dto';
 import { UpdateOrderDto } from '../dto/update-order.dto';
@@ -235,6 +229,10 @@ export class OrderService {
       where: { id },
       data: { statusOrder: 'cancelled', canceledAt: new Date() },
     });
+  }
+
+  async getAllOrders() {
+    return await this.prisma.order.findMany();
   }
 
   private convertToResponseDto(order: Order): OrderResponseDto {

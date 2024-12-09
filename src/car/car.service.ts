@@ -62,6 +62,12 @@ export class CarService {
   async update(id: number, updateCarDto: UpdateCarDto) {
     const findCar = await this.repository.findCarById(id);
 
+    if (!findCar.status) {
+      throw new NotFoundException(
+        'It is not possible to change a car with inactive status',
+      );
+    }
+
     if (!findCar) {
       throw new NotFoundException('Car not found');
     }

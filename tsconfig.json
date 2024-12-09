@@ -10,10 +10,6 @@
     "sourceMap": true,
     "outDir": "./dist",
     "baseUrl": "./",
-    "paths": {
-      "src/*": ["./src/*"],
-      "prisma/*": ["./src/prisma/*"]
-    },
     "incremental": true,
     "skipLibCheck": true,
     "strictNullChecks": false,

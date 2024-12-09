@@ -1,7 +1,7 @@
 import { Test, TestingModule } from '@nestjs/testing';
 import { OrderController } from '../../src/order/repository/order.controller';
 import { OrderService } from '../../src/order/repository/order.service';
-import { PrismaService } from 'src/prisma/prisma.service';
+import { PrismaService } from 'prisma/prisma.service';
 import * as request from 'supertest';
 import { INestApplication } from '@nestjs/common';
 import { mockPrismaService } from './mock-prisma.service';

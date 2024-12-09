@@ -1,5 +1,5 @@
 import { Injectable, HttpStatus, HttpException } from '@nestjs/common';
-import { PrismaService } from 'src/prisma/prisma.service';
+import { PrismaService } from 'prisma/prisma.service';
 import { CreateOrderDto, StatusOrder } from '../dto/create-order.dto';
 import { UpdateOrderDto } from '../dto/update-order.dto';
 import { OrderResponseDto } from '../dto/order-response.dto';
@@ -17,6 +17,7 @@ export class OrderService {
         throw new HttpException('Invalid CEP', HttpStatus.BAD_REQUEST);
       }
       return response.data;
+      // eslint-disable-next-line @typescript-eslint/no-unused-vars
     } catch (error) {
       throw new HttpException(
         'Error while fetching address from VIACEP',
@@ -41,7 +42,6 @@ export class OrderService {
     try {
       const { clientId, carId, startDate, endDate, cep } = createOrderDto;
 
-      //validates and searches for CEP in the VIA API
       const address = await this.getAddressByCep(cep);
 
       //rental fee calculation
@@ -56,7 +56,7 @@ export class OrderService {
       //number of days calculation
       const days = this.calculateDays(startDate, endDate);
 
-      //get car´s daily price
+      //gets car´s daily price
       const car = await this.prisma.car.findUnique({ where: { id: carId } });
       if (!car || !car.status) {
         throw new HttpException('Car is not available', HttpStatus.BAD_REQUEST);
@@ -105,6 +105,7 @@ export class OrderService {
     //updates order´s fields
     let rentalFee = order.rentalFee;
     let totalAmount = order.totalAmount;
+    // eslint-disable-next-line @typescript-eslint/no-explicit-any
     let updatedData: any = { statusOrder: updateOrderDto.statusOrder };
 
     //updates location data and recalculates rental fee if CEP is sent

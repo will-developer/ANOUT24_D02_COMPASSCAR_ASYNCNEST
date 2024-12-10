@@ -3,7 +3,9 @@ import {
   Controller,
   Delete,
   Get,
+  InternalServerErrorException,
   Param,
+  ParseIntPipe,
   Post,
   Put,
   Query,
@@ -31,7 +33,11 @@ export class ClientsController {
   })
   @Post()
   async createClient(@Body() data: CreateClientDto): Promise<Client> {
-    return this.clientsService.createClient(data);
+    try {
+      return this.clientsService.createClient(data);
+    } catch (error) {
+      throw new InternalServerErrorException();
+    }
   }
 
   // UPDATE CLIENT
@@ -50,7 +56,7 @@ export class ClientsController {
   })
   @Put(':id')
   async updateClient(
-    @Param('id') id: number,
+    @Param('id', ParseIntPipe) id: number,
     @Body() data: UpdateClientDto,
   ): Promise<Client> {
     return this.clientsService.updateClient(id, data);
@@ -95,7 +101,8 @@ export class ClientsController {
     description: 'Client not found',
   })
   @Get(':id')
-  async getClientById(@Param('id') id: number): Promise<Client> {
+  async getClientById(@Param('id', ParseIntPipe) id: number): Promise<Client> {
+    console.log('Received ID:', id, 'Type:', typeof id);
     return this.clientsService.getClientById(id);
   }
 
@@ -110,7 +117,9 @@ export class ClientsController {
     description: 'Client not found',
   })
   @Delete(':id')
-  async deleteClient(@Param('id') id: number): Promise<{ message: string }> {
+  async deleteClient(
+    @Param('id', ParseIntPipe) id: number,
+  ): Promise<{ message: string }> {
     await this.clientsService.deleteClient(id);
     return { message: 'Client successfully deleted' };
   }

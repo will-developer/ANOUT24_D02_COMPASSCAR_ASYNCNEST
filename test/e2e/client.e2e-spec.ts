@@ -3,6 +3,7 @@ import { CanActivate, INestApplication } from '@nestjs/common';
 import * as request from 'supertest';
 import { PrismaService } from 'prisma/prisma.service';
 import { AppModule } from 'src/app.module';
+import { JwtAuthGuard } from 'src/auth/infrastructure/guards/jwt-auth.guard';
 
 describe('Client Module (e2e)', () => {
   let app: INestApplication;
@@ -13,7 +14,7 @@ describe('Client Module (e2e)', () => {
     const moduleFixture: TestingModule = await Test.createTestingModule({
       imports: [AppModule],
     })
-      .overrideGuard(APP_GUARD)
+      .overrideGuard(JwtAuthGuard)
       .useValue(MockAuthGuard)
       .compile();
 

@@ -27,6 +27,19 @@ services:
       - "3306:3306"
     volumes:
       - db_data:/var/lib/mysql
+  
+  test_db:
+    image: mysql:9
+    container_name: test_db
+    restart: unless-stopped
+    environment:
+      MYSQL_ROOT_PASSWORD: root
+      MYSQL_DATABASE: compasscar_test
+    ports:
+      - "3309:3306"
+    volumes:
+      - test_db_data:/var/lib/mysql
 
 volumes:
   db_data:
+  test_db_data:

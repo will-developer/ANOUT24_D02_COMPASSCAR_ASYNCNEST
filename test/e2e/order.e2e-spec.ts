@@ -3,10 +3,11 @@ import { OrderController } from '../../src/order/repository/order.controller';
 import { OrderService } from '../../src/order/repository/order.service';
 import { PrismaService } from 'prisma/prisma.service';
 import * as request from 'supertest';
-import { INestApplication } from '@nestjs/common';
+import { CanActivate, INestApplication } from '@nestjs/common';
 import { mockPrismaService } from './mock-prisma.service';
 import { axiosMock } from './mock-axios';
 import axios from 'axios';
+import { JwtAuthGuard } from 'src/auth/infrastructure/guards/jwt-auth.guard';
 
 jest.mock('axios');
 
@@ -14,6 +15,7 @@ describe('OrderController (E2E)', () => {
   let app: INestApplication;
 
   beforeEach(async () => {
+    const MockAuthGuard: CanActivate = { canActivate: jest.fn(() => true) };
     const moduleFixture: TestingModule = await Test.createTestingModule({
       controllers: [OrderController],
       providers: [
@@ -23,6 +25,8 @@ describe('OrderController (E2E)', () => {
     })
       .overrideProvider(axios)
       .useValue(axiosMock)
+      .overrideGuard(JwtAuthGuard)
+      .useValue(MockAuthGuard)
       .compile();
 
     app = moduleFixture.createNestApplication();

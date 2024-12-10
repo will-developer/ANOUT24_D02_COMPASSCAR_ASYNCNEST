@@ -1,4 +1,4 @@
-import { Injectable } from '@nestjs/common';
+import { BadRequestException, Injectable } from '@nestjs/common';
 import { CreateCarDto } from '../dto/create-car.dto';
 import { CarEntity } from '../entities/car.entity';
 import { UpdateCarDto } from '../dto/update-car.dto';
@@ -24,7 +24,6 @@ export class CarRepository {
         items: {
           select: {
             name: true,
-            carId: true,
           },
         },
       },
@@ -59,7 +58,6 @@ export class CarRepository {
         items: {
           select: {
             name: true,
-            carId: true,
           },
         },
       },
@@ -84,7 +82,6 @@ export class CarRepository {
         items: {
           select: {
             name: true,
-            carId: true,
           },
         },
       },
@@ -100,43 +97,108 @@ export class CarRepository {
   }
 
   async update(id: number, updateCarDto: UpdateCarDto): Promise<CarEntity> {
-    const { items, ...carData } = updateCarDto;
+    const { plate, items, brand, model, ...carData } = updateCarDto;
+
+    if (
+      !updateCarDto ||
+      (!updateCarDto.brand &&
+        !updateCarDto.model &&
+        !updateCarDto.year &&
+        !updateCarDto.km &&
+        !updateCarDto.dailyPrice &&
+        !updateCarDto.items)
+    ) {
+      throw new BadRequestException(
+        'At least one field (brand, model, year, km, dailyPrice, items) must be provided for update.',
+      );
+    }
+
+    if ((brand && !model) || model === '') {
+      throw new BadRequestException(
+        'The model must be provided when updating the brand.',
+      );
+    }
+
+    if (plate) {
+      throw new BadRequestException('It is not possible to change the plate.');
+    }
+
+    if (items) {
+      await this.prisma.car.update({
+        where: { id },
+        data: {
+          items: {
+            deleteMany: {},
+          },
+        },
+      });
+
+      return this.prisma.car.update({
+        where: { id },
+        data: {
+          ...carData,
+          updatedAt: new Date(),
+          brand,
+          model,
+          items: {
+            create: items.map((item) => ({
+              name: item.name,
+            })),
+          },
+        },
+        include: {
+          items: {
+            select: {
+              name: true,
+              carId: true,
+            },
+          },
+        },
+      });
+    }
 
     return this.prisma.car.update({
-      where: {
-        id,
-      },
+      where: { id },
       data: {
         ...carData,
+        brand,
+        model,
         updatedAt: new Date(),
-        items: {
-          create: items.map((item) => ({
-            name: item.name,
-          })),
-        },
       },
       include: {
         items: {
           select: {
             name: true,
-            carId: true,
           },
         },
       },
     });
   }
 
-  async delete(id: number): Promise<CarEntity> {
+  async delete(id: number): Promise<{ message: string }> {
+    const existCar = await this.prisma.car.findFirst({
+      where: { id },
+    });
+
+    if (!existCar.status) {
+      return {
+        message: `This car has already been deleted`,
+      };
+    }
+
     const status = false;
     const inactivatedAt = new Date();
-    return this.prisma.car.update({
+
+    await this.prisma.car.update({
       where: { id },
       data: {
         status,
         inactivatedAt,
       },
     });
-  }
 
-  //todo: implementar 'Não deve inativar um carro se ele estiver fazendo parte de um pedido aberto ou aprovado.'
+    return {
+      message: `The car with the plate: ${existCar.plate} has been deleted`,
+    };
+  }
 }

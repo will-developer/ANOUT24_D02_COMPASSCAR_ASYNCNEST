@@ -3,7 +3,9 @@ import {
   Controller,
   Delete,
   Get,
+  InternalServerErrorException,
   Param,
+  ParseIntPipe,
   Post,
   Put,
   Query,
@@ -12,7 +14,12 @@ import {
 import { ClientsService } from './clients.service';
 import { CreateClientDto } from './dtos/create-client.dto';
 import { UpdateClientDto } from './dtos/update-client.dto';
-import { ApiOperation, ApiResponse, ApiBearerAuth, ApiTags } from '@nestjs/swagger';
+import {
+  ApiOperation,
+  ApiResponse,
+  ApiBearerAuth,
+  ApiTags,
+} from '@nestjs/swagger';
 import { Client } from '@prisma/client';
 import { ClientFiltersDto } from './dtos/filters-client.dto';
 import { JwtAuthGuard } from 'src/auth/infrastructure/guards/jwt-auth.guard';
@@ -49,9 +56,13 @@ export class ClientsController {
     status: 404,
     description: 'Client not found',
   })
+  @ApiResponse({
+    status: 400,
+    description: 'Invalid action',
+  })
   @Put(':id')
   async updateClient(
-    @Param('id') id: number,
+    @Param('id', ParseIntPipe) id: number,
     @Body() data: UpdateClientDto,
   ): Promise<Client> {
     return this.clientsService.updateClient(id, data);
@@ -96,7 +107,7 @@ export class ClientsController {
     description: 'Client not found',
   })
   @Get(':id')
-  async getClientById(@Param('id') id: number): Promise<Client> {
+  async getClientById(@Param('id', ParseIntPipe) id: number): Promise<Client> {
     return this.clientsService.getClientById(id);
   }
 
@@ -111,7 +122,9 @@ export class ClientsController {
     description: 'Client not found',
   })
   @Delete(':id')
-  async deleteClient(@Param('id') id: number): Promise<{ message: string }> {
+  async deleteClient(
+    @Param('id', ParseIntPipe) id: number,
+  ): Promise<{ message: string }> {
     await this.clientsService.deleteClient(id);
     return { message: 'Client successfully deleted' };
   }

@@ -84,7 +84,7 @@ export class ClientsRepository {
 
     const clients = await this.prisma.client.findMany({
       skip,
-      take: perPage,
+      take: Number(perPage),
       where: {
         name: name ? { contains: name } : undefined,
         email: email ? { contains: email } : undefined,

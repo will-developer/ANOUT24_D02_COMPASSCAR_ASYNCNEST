@@ -66,7 +66,6 @@ export class CarController {
     @Query('brand') brand?: string,
     @Query('km') km?: string,
     @Query('year') year?: string,
-    @Query('status') status?: string,
     @Query('dailyPrice') dailyPrice?: string,
   ) {
     let pageNumber = page ? parseInt(page, 10) : 1;

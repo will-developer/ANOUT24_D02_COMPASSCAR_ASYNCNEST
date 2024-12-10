@@ -78,7 +78,7 @@ export class CarService {
     const findCar = await this.repository.findCarById(id);
 
     if (!findCar) {
-      throw new BadRequestException('Car not found');
+      throw new NotFoundException('Car not found');
     }
 
     const getAllOrders = await this.orderService.getAllOrders();

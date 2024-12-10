@@ -11,7 +11,7 @@ services:
     environment:
       DATABASE_URL: "mysql://root:root@db:3306/compasscar"
       NODE_ENV: development
-    command: sh -c "npm install && npx prisma migrate deploy && npm run start:dev"
+    command: sh -c "npm install && npx prisma migrate deploy && npm run prisma:seed && npm run start:dev"
     depends_on:
       - db
     restart: unless-stopped

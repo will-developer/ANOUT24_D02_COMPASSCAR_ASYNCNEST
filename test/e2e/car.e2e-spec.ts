@@ -21,17 +21,22 @@ describe('CarService (e2e)', () => {
     app = moduleFixture.createNestApplication();
     prisma = app.get(PrismaService);
 
+    await prisma.carItem.deleteMany();
+    await prisma.car.deleteMany();
+
     await app.init();
   });
 
   afterAll(async () => {
+    await prisma.carItem.deleteMany();
+    await prisma.car.deleteMany();
     await app.close();
   });
 
   const createCarDto = {
     brand: 'Jeep',
     model: 'Compass',
-    plate: `${Date.now()}`,
+    plate: `ABX-1234`,
     year: 2020,
     km: 10000,
     dailyPrice: 200,
@@ -52,6 +57,28 @@ describe('CarService (e2e)', () => {
       expect(response.body).toHaveProperty('km');
       expect(response.body).toHaveProperty('dailyPrice');
       expect(response.body).toHaveProperty('items');
+    });
+  });
+
+  describe('All fields are required', () => {
+    it('should return an error if brand is empty', async () => {
+      const createCarDto1 = {
+        brand: '',
+        model: 'Compass',
+        plate: 'XBC-1234',
+        year: 2020,
+        km: 10000,
+        dailyPrice: 200,
+        items: ['Air Conditioning', 'Baby-Seat'],
+      };
+
+      await request(app.getHttpServer())
+        .post('/car')
+        .send(createCarDto1)
+        .expect(400)
+        .expect((res) => {
+          expect(res.body.message).toContain('Brand is required.');
+        });
     });
   });
 });

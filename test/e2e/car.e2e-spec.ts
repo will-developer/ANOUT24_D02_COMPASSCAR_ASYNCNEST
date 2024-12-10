@@ -1,9 +1,10 @@
 import { Test, TestingModule } from '@nestjs/testing';
 import * as request from 'supertest';
-import { CanActivate, INestApplication } from '@nestjs/common';
+import { Body, CanActivate, INestApplication } from '@nestjs/common';
 import { PrismaService } from 'prisma/prisma.service';
 import { AppModule } from 'src/app.module';
 import { JwtAuthGuard } from '../../src/auth/infrastructure/guards/jwt-auth.guard';
+import { CreateCarDto } from '../../src/car/dto/create-car.dto';
 
 describe('CarService (e2e)', () => {
   let app: INestApplication;
@@ -57,6 +58,18 @@ describe('CarService (e2e)', () => {
       expect(response.body).toHaveProperty('km');
       expect(response.body).toHaveProperty('dailyPrice');
       expect(response.body).toHaveProperty('items');
+    });
+
+    it('should date and status active in create', async () => {
+      const createCarDtoComplete = {
+        ...CreateCarDto,
+        status: true,
+        createdAt: new Date(),
+      };
+      await request(app.getHttpServer())
+        .post('/car')
+        .send(createCarDtoComplete)
+        .expect(400);
     });
   });
 

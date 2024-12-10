@@ -44,6 +44,10 @@ export class ClientsController {
     status: 404,
     description: 'Client not found',
   })
+  @ApiResponse({
+    status: 400,
+    description: 'Invalid action',
+  })
   @Put(':id')
   async updateClient(
     @Param('id') id: number,

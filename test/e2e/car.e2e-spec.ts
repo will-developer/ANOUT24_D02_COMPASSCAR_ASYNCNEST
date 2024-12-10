@@ -78,11 +78,11 @@ describe('CarService (e2e)', () => {
       const payload = {
         brand: 'Jeep',
         model: 'Compass',
-        plate: 'BBC-1234',
+        plate: 'BBB-1234',
         year: 2020,
         km: 10000,
         dailyPrice: 200,
-        items: [{ name: 'Air-Condition' }, { name: 'Air-Condition' }],
+        items: [{ name: 'GPS' }, { name: 'GPS' }],
       };
 
       await request(app.getHttpServer())
@@ -91,7 +91,7 @@ describe('CarService (e2e)', () => {
         .expect(400)
         .expect((res) => {
           expect(res.body.message).toContain(
-            'Items must be between 1 and 5 and cannot contain duplicates.',
+            'Items and accessories cannot be duplicated.',
           );
         });
     });

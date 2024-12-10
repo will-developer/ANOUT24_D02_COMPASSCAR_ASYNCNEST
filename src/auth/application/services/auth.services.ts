@@ -34,12 +34,4 @@ export class AuthService {
       access_token: this.jwtService.sign(payload),
     };
   }
-
-  async signUp(createUserDto: CreateUserDTO) {
-    const hashedPassword = await bcrypt.hash(createUserDto.password, 10);
-    return this.usersService.createUser({
-      ...createUserDto,
-      password: hashedPassword,
-    });
-  }
 }

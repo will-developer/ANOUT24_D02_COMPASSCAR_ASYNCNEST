@@ -25,20 +25,6 @@ describe('CarService (e2e)', () => {
     await prisma.carItem.deleteMany();
     await prisma.car.deleteMany();
 
-    await prisma.car.create({
-      data: {
-        brand: 'Test Brand',
-        model: 'Test Model',
-        plate: 'AAA-1234',
-        year: 2020,
-        km: 10000,
-        dailyPrice: 150,
-        items: {
-          create: [{ name: 'Air Conditioning' }, { name: 'GPS' }],
-        },
-      },
-    });
-
     await app.init();
   });
 
@@ -378,6 +364,187 @@ describe('CarService (e2e)', () => {
           );
           expect(res.body.brand).toBe('Honda');
           expect(res.body.model).toBe('Civic');
+        });
+    });
+  });
+
+  describe('GET /car valid cases', () => {
+    it('should list cars paginated', async () => {
+      await prisma.car.create({
+        data: {
+          brand: 'Test Brand',
+          model: 'Test Model',
+          plate: 'DBB-1234',
+          year: 2020,
+          km: 10000,
+          dailyPrice: 150,
+          items: {
+            create: [{ name: 'Air Conditioning' }, { name: 'GPS' }],
+          },
+        },
+      });
+
+      await prisma.car.create({
+        data: {
+          brand: 'Test Brand',
+          model: 'Test Model',
+          plate: 'DAA-1234',
+          year: 2020,
+          km: 10000,
+          dailyPrice: 150,
+          items: {
+            create: [{ name: 'Air Conditioning' }, { name: 'GPS' }],
+          },
+        },
+      });
+      await request(app.getHttpServer())
+        .get(`/car?page=1&limit=2`)
+        .expect(200)
+        .expect((res) => {
+          expect(res.body.data.length).toBe(2);
+        });
+    });
+
+    it('should filter cars by brand', async () => {
+      await prisma.car.create({
+        data: {
+          brand: 'Test Brand',
+          model: 'Test Model',
+          plate: 'DCC-1234',
+          year: 2020,
+          km: 10000,
+          dailyPrice: 150,
+          items: {
+            create: [{ name: 'Air Conditioning' }, { name: 'GPS' }],
+          },
+        },
+      });
+      await request(app.getHttpServer())
+        .get('/car?brand=Test Brand')
+        .expect(200)
+        .expect((res) => {
+          expect(res.body.data.length).toBeGreaterThan(0);
+          expect(res.body.data[0].brand).toContain('Test Brand');
+        });
+    });
+
+    it('should filter cars by km', async () => {
+      await prisma.car.create({
+        data: {
+          brand: 'Test Brand',
+          model: 'Test Model',
+          plate: 'DDD-1234',
+          year: 2020,
+          km: 10000,
+          dailyPrice: 150,
+          items: {
+            create: [{ name: 'Air Conditioning' }, { name: 'GPS' }],
+          },
+        },
+      });
+      await request(app.getHttpServer())
+        .get('/car?km=10000')
+        .expect(200)
+        .expect((res) => {
+          expect(res.body.data.length).toBeGreaterThan(0);
+          expect(res.body.data[0].km).toBeLessThanOrEqual(10000);
+        });
+    });
+
+    it('should filter cars by year', async () => {
+      await prisma.car.create({
+        data: {
+          brand: 'Test Brand',
+          model: 'Test Model',
+          plate: 'DEE-1234',
+          year: 2020,
+          km: 10000,
+          dailyPrice: 150,
+          items: {
+            create: [{ name: 'Air Conditioning' }, { name: 'GPS' }],
+          },
+        },
+      });
+      await request(app.getHttpServer())
+        .get('/car?year=2020')
+        .expect(200)
+        .expect((res) => {
+          expect(res.body.data.length).toBeGreaterThan(0);
+          expect(res.body.data[0].year).toBeGreaterThanOrEqual(2020);
+        });
+    });
+
+    it('should filter cars by status true', async () => {
+      await prisma.car.create({
+        data: {
+          brand: 'Test Brand',
+          model: 'Test Model',
+          plate: 'DFF-1234',
+          year: 2020,
+          km: 10000,
+          status: true,
+          dailyPrice: 150,
+          items: {
+            create: [{ name: 'Air Conditioning' }, { name: 'GPS' }],
+          },
+        },
+      });
+
+      await request(app.getHttpServer())
+        .get('/car?status=active')
+        .expect(200)
+        .expect((res) => {
+          expect(res.body.data.length).toBeGreaterThan(0);
+          expect(res.body.data[0].status).toBe(true);
+        });
+    });
+
+    it.skip('should filter cars by status false', async () => {
+      const car = await prisma.car.create({
+        data: {
+          brand: 'Test Brand',
+          model: 'Test Model',
+          plate: 'DGG-1234',
+          year: 2020,
+          km: 10000,
+          dailyPrice: 150,
+          items: {
+            create: [{ name: 'Air Conditioning' }, { name: 'GPS' }],
+          },
+        },
+      });
+
+      await request(app.getHttpServer()).delete(`/car:${car.id}`).expect(200);
+
+      await request(app.getHttpServer())
+        .get('/car?status=false')
+        .expect(200)
+        .expect((res) => {
+          expect(res.body.data.length).toBeGreaterThan(0);
+          expect(res.body.data[0].status).toBe('false');
+        });
+    });
+
+    it('should filter cars by daily price', async () => {
+      await prisma.car.create({
+        data: {
+          brand: 'Test Brand',
+          model: 'Test Model',
+          plate: 'DHH-1234',
+          year: 2020,
+          km: 10000,
+          dailyPrice: 150,
+          items: {
+            create: [{ name: 'Air Conditioning' }, { name: 'GPS' }],
+          },
+        },
+      });
+      await request(app.getHttpServer())
+        .get('/car?dailyPrice=150')
+        .expect(200)
+        .expect((res) => {
+          expect(res.body.data.length).toBeGreaterThan(0);
+          expect(res.body.data[0].dailyPrice).toBeLessThanOrEqual(150);
         });
     });
   });

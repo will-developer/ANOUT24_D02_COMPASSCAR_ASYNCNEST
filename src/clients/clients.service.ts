@@ -23,7 +23,8 @@ export class ClientsService {
       data.email,
     );
 
-    const age = this.idade(data.birthDate);
+    const birthDate = new Date(data.birthDate);
+    const age = this.idade(birthDate);
 
     if (client) {
       if (client.cpf === data.cpf) {

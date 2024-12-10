@@ -13,11 +13,13 @@ export class JwtStrategy extends PassportStrategy(Strategy) {
     super({
       jwtFromRequest: ExtractJwt.fromAuthHeaderAsBearerToken(),
       ignoreExpiration: false,
-      secretOrKey: configService.get('JWT_SECRET') || 'your-fallback-secret',
+      secretOrKey: configService.get('JWT_SECRET') || 'asyncnest-best-group',
     });
+    console.log('JWT Secret:', configService.get('JWT_SECRET'));
   }
 
   async validate(payload: any) {
+    console.log('Validating payload:', payload);
     const user = await this.usersService.findById(payload.sub);
     if (!user) {
       throw new UnauthorizedException();

@@ -13,7 +13,7 @@ export class SignInDto {
   @MinLength(8)
   @ApiProperty({
     example: '12345678',
-    description: 'Password',
+    description: 'Plain Text Password',
   })
   password: string;
 }

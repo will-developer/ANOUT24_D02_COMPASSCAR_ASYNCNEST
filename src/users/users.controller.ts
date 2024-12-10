@@ -8,6 +8,7 @@ import {
   Patch,
   Post,
   Query,
+  UseGuards,
   ValidationPipe,
 } from '@nestjs/common';
 import { CreateUserDTO } from './dto/create-user.dto';
@@ -20,15 +21,15 @@ import {
   ApiResponse,
   ApiTags,
 } from '@nestjs/swagger';
-import { Auth } from '../auth/infrastructure/decorators/auth.decorator';
-import { CurrentUser } from '../auth/infrastructure/decorators/user.decorator';
+import { JwtAuthGuard } from 'src/auth/infrastructure/guards/jwt-auth.guard';
 
+@UseGuards(JwtAuthGuard)
 @Controller('users')
 @ApiTags('Users')
 export class UsersController {
   constructor(private readonly usersService: UsersService) {}
 
-  @Auth()
+  
   @Post()
   @ApiResponse({
     status: HttpStatus.CREATED,
@@ -55,7 +56,7 @@ export class UsersController {
     return this.usersService.createUser(dto);
   }
 
-  @Auth()
+  
   @Patch(':id')
   @ApiResponse({
     status: HttpStatus.OK,
@@ -110,7 +111,7 @@ export class UsersController {
     return this.usersService.updateUser(+id, dto);
   }
 
-  @Auth()
+  
   @Get()
   @ApiQuery({
     name: 'page',
@@ -159,7 +160,7 @@ export class UsersController {
     return this.usersService.findAll(query, query.page, query.limit);
   }
 
-  @Auth()
+  
   @Get(':id')
   @ApiResponse({
     status: HttpStatus.OK,
@@ -179,7 +180,7 @@ export class UsersController {
     return this.usersService.findById(+id);
   }
 
-  @Auth()
+  
   @Delete(':id')
   @ApiResponse({
     status: HttpStatus.OK,

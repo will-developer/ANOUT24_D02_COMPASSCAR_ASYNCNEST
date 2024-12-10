@@ -124,7 +124,10 @@ export class CarController {
   @ApiForbiddenResponse({
     description: 'Access denied.',
   })
-  update(@Param('id') id: string, @Body() updateCarDto: UpdateCarDto) {
+  update(
+    @Param('id') id: string,
+    @Body(new ValidationPipe()) updateCarDto: UpdateCarDto,
+  ) {
     return this.carService.update(+id, updateCarDto);
   }
 

@@ -26,7 +26,7 @@ export class CarService {
     const uniqueArrItems = new Set(arrItems.map((items) => items.name));
 
     if (uniqueArrItems.size !== arrItems.length) {
-      throw new NotFoundException(
+      throw new BadRequestException(
         'Items and accessories cannot be duplicated.',
       );
     }

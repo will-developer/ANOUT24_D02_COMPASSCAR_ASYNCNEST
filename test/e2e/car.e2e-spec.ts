@@ -25,6 +25,20 @@ describe('CarService (e2e)', () => {
     await prisma.carItem.deleteMany();
     await prisma.car.deleteMany();
 
+    await prisma.car.create({
+      data: {
+        brand: 'Test Brand',
+        model: 'Test Model',
+        plate: 'AAA-1234',
+        year: 2020,
+        km: 10000,
+        dailyPrice: 150,
+        items: {
+          create: [{ name: 'Air Conditioning' }, { name: 'GPS' }],
+        },
+      },
+    });
+
     await app.init();
   });
 
@@ -232,6 +246,23 @@ describe('CarService (e2e)', () => {
         .post('/car')
         .send(createCarDto2)
         .expect(400);
+    });
+  });
+
+  describe('Update Car - Optional Fields', () => {
+    it('should return an error if the model is missing when brand is updated', async () => {
+      const updateCarDto = {
+        brand: 'Jeep',
+        model: '',
+      };
+
+      await request(app.getHttpServer())
+        .patch('/car/1')
+        .send(updateCarDto)
+        .expect(400)
+        .expect((res) => {
+          expect(res.body.message).toContain('Model is required.');
+        });
     });
   });
 });

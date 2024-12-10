@@ -9,9 +9,9 @@ export class AuthController {
   constructor(private authService: AuthService) {}
 
   @ApiOperation({ summary: 'Sign in user' })
-  @ApiResponse({ 
-    status: 200, 
-    description: 'Returns JWT access token'
+  @ApiResponse({
+    status: 200,
+    description: 'Returns JWT access token',
   })
   @ApiResponse({ status: 401, description: 'Invalid credentials' })
   @Post('signin')

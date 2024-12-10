@@ -1,18 +1,23 @@
 import { Test, TestingModule } from '@nestjs/testing';
 import * as request from 'supertest';
 import * as bcrypt from 'bcrypt';
-import { INestApplication } from '@nestjs/common';
+import { CanActivate, INestApplication } from '@nestjs/common';
 import { PrismaService } from 'prisma/prisma.service';
 import { AppModule } from 'src/app.module';
+import { JwtAuthGuard } from 'src/auth/infrastructure/guards/jwt-auth.guard';
 
 describe('UsersService (e2e)', () => {
   let app: INestApplication;
   let prisma: PrismaService;
 
   beforeAll(async () => {
+    const MockAuthGuard: CanActivate = { canActivate: jest.fn(() => true) };
     const moduleFixture: TestingModule = await Test.createTestingModule({
       imports: [AppModule],
-    }).compile();
+    })
+      .overrideGuard(JwtAuthGuard)
+      .useValue(MockAuthGuard)
+      .compile();
 
     app = moduleFixture.createNestApplication();
     prisma = app.get(PrismaService);

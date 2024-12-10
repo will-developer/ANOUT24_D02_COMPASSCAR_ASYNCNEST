@@ -7,11 +7,11 @@ services:
       - "3000:3000"
     volumes:
     - .:/usr/src/app
-    #- /usr/src/app/node_modules
+    - /usr/src/app/node_modules
     environment:
-      DATABASE_URL: "mysql://root:root@db:3306/database"
+      DATABASE_URL: "mysql://root:root@db:3306/compasscar"
       NODE_ENV: development
-    command: sh -c "npm install && npx prisma migrate deploy && npm run start:dev"
+    command: sh -c "npm install && npx prisma migrate deploy && npm run prisma:seed && npm run start:dev"
     depends_on:
       - db
     restart: unless-stopped
@@ -22,11 +22,24 @@ services:
     restart: unless-stopped
     environment:
       MYSQL_ROOT_PASSWORD: root 
-      MYSQL_DATABASE: database
+      MYSQL_DATABASE: compasscar
     ports:
       - "3306:3306"
     volumes:
       - db_data:/var/lib/mysql
+  
+  test_db:
+    image: mysql:9
+    container_name: test_db
+    restart: unless-stopped
+    environment:
+      MYSQL_ROOT_PASSWORD: root
+      MYSQL_DATABASE: compasscar_test
+    ports:
+      - "3309:3306"
+    volumes:
+      - test_db_data:/var/lib/mysql
 
 volumes:
   db_data:
+  test_db_data:

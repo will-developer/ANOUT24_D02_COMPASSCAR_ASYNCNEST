@@ -239,10 +239,6 @@ export class OrderService {
     });
   }
 
-  async getAllOrders() {
-    return await this.prisma.order.findMany();
-  }
-
   private convertToResponseDto(order: Order): OrderResponseDto {
     return {
       id: order.id,

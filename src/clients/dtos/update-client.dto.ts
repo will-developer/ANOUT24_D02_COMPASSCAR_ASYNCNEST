@@ -1,6 +1,17 @@
 import { ApiProperty } from '@nestjs/swagger';
 import { Type } from 'class-transformer';
-import { IsEmail, IsOptional, IsString, Matches } from 'class-validator';
+import {
+  IsEmail,
+  IsNotEmpty,
+  IsOptional,
+  IsString,
+  Length,
+  Matches,
+  MaxLength,
+  MinLength,
+  Validate,
+} from 'class-validator';
+import { IsCpf } from '../decorators/is-cpf.decorator';
 
 // all fields are optional
 
@@ -16,14 +27,12 @@ export class UpdateClientDto {
 
   @ApiProperty({
     description: "Customer's CPF",
-    example: '123.456.789-10',
-    required: false,
+    example: '74836512894',
   })
   @IsOptional()
   @IsString()
-  @Matches(/^\d{3}(\.\d{3}){2}-\d{2}$|^\d{11}$/, {
-    message: 'CPF must be 11 digits',
-  })
+  @Length(11, 11, { message: 'CPF must contain exactly 11 digits' })
+  @Validate(IsCpf)
   cpf?: string;
 
   @ApiProperty({
@@ -46,12 +55,10 @@ export class UpdateClientDto {
 
   @ApiProperty({
     description: "Customer's phone number",
-    example: '(11) 12345-6789',
-    required: false,
+    example: '11123456789',
   })
   @IsOptional()
-  @Matches(/^\(\d{2}\)\s?\d{5}-\d{4}$/, {
-    message: 'Phone must be in format: (11) 12345-6789',
-  })
+  @MinLength(10)
+  @MaxLength(11)
   phone?: string;
 }

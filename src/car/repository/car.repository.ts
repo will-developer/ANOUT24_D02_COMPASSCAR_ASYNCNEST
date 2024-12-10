@@ -1,9 +1,9 @@
 import { Injectable } from '@nestjs/common';
 import { CreateCarDto } from '../dto/create-car.dto';
 import { CarEntity } from '../entities/car.entity';
-import { PrismaService } from '../../prisma/prisma.service';
 import { UpdateCarDto } from '../dto/update-car.dto';
 import { CarFilters } from '../filters/carFilters';
+import { PrismaService } from 'prisma/prisma.service';
 
 @Injectable()
 export class CarRepository {

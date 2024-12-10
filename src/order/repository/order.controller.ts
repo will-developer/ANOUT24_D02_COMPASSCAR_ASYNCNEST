@@ -1,3 +1,4 @@
+import { ApiOperation, ApiResponse } from '@nestjs/swagger';
 import {
   Controller,
   Post,
@@ -24,6 +25,17 @@ export class OrderController {
   constructor(private readonly orderService: OrderService) {}
 
   @Post()
+  @Post()
+  @ApiOperation({ summary: 'Create a new order' })
+  @ApiResponse({
+    status: 201,
+    description: 'The order has been successfully created.',
+    type: OrderResponseDto,
+  })
+  @ApiResponse({
+    status: 400,
+    description: 'Bad Request',
+  })
   @UsePipes(ValidateDatePipe, ValidateClientPipe, ValidateCarPipe)
   async create(
     @Body() createOrderDto: CreateOrderDto,
@@ -36,6 +48,20 @@ export class OrderController {
   }
 
   @Put(':id')
+  @ApiOperation({ summary: 'Update an existing order' })
+  @ApiResponse({
+    status: 200,
+    description: 'The order has been successfully updated.',
+    type: OrderResponseDto,
+  })
+  @ApiResponse({
+    status: 400,
+    description: 'Bad Request',
+  })
+  @ApiResponse({
+    status: 404,
+    description: 'Order not found',
+  })
   @UsePipes(ValidateDatePipe, ValidateClientPipe, ValidateCarPipe)
   async update(
     @Param('id') id: number,
@@ -49,6 +75,12 @@ export class OrderController {
   }
 
   @Get()
+  @ApiOperation({ summary: 'Get all orders' })
+  @ApiResponse({
+    status: 200,
+    description: 'List of orders.',
+    type: [OrderResponseDto],
+  })
   async findAll(
     @Query('cpf') cpf: string | undefined,
     @Query('status') status: string | undefined,
@@ -63,6 +95,16 @@ export class OrderController {
   }
 
   @Get(':id')
+  @ApiOperation({ summary: 'Get a specific order by ID' })
+  @ApiResponse({
+    status: 200,
+    description: 'The order details.',
+    type: OrderResponseDto,
+  })
+  @ApiResponse({
+    status: 404,
+    description: 'Order not found',
+  })
   async findOne(@Param('id') id: number): Promise<OrderResponseDto> {
     try {
       return await this.orderService.findOne(id);
@@ -72,7 +114,16 @@ export class OrderController {
   }
 
   @Delete(':id')
-  async cancelOrder(@Param('id') id: number): Promise<void> {
+  @ApiOperation({ summary: 'Cancel an order' })
+  @ApiResponse({
+    status: 204,
+    description: 'Order successfully cancelled.',
+  })
+  @ApiResponse({
+    status: 400,
+    description: 'Bad Request',
+  })
+  async cancelOrder(@Param('id') id: number): Promise<{ message: string }> {
     try {
       return await this.orderService.cancelOrder(id);
     } catch (error) {

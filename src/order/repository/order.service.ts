@@ -1,3 +1,4 @@
+import { ApiOperation, ApiResponse, ApiTags } from '@nestjs/swagger';
 import { Injectable, HttpStatus, HttpException } from '@nestjs/common';
 import { PrismaService } from 'prisma/prisma.service';
 import { CreateOrderDto, StatusOrder } from '../dto/create-order.dto';
@@ -6,6 +7,7 @@ import { OrderResponseDto } from '../dto/order-response.dto';
 import axios from 'axios';
 import { Order } from '@prisma/client';
 
+@ApiTags('orders')
 @Injectable()
 export class OrderService {
   constructor(private prisma: PrismaService) {}
@@ -38,6 +40,12 @@ export class OrderService {
     return timeDifference / (1000 * 3600 * 24);
   }
 
+  @ApiOperation({ summary: 'Create a new order' })
+  @ApiResponse({
+    status: HttpStatus.CREATED,
+    description: 'The order has been successfully created',
+    type: OrderResponseDto,
+  })
   async create(createOrderDto: CreateOrderDto): Promise<OrderResponseDto> {
     try {
       const { clientId, carId, startDate, endDate, cep } = createOrderDto;
@@ -90,6 +98,20 @@ export class OrderService {
     }
   }
 
+  @ApiOperation({ summary: 'Update an existing order' })
+  @ApiResponse({
+    status: HttpStatus.OK,
+    description: 'The order has been successfully updated',
+    type: OrderResponseDto,
+  })
+  @ApiResponse({
+    status: HttpStatus.NOT_FOUND,
+    description: 'Order not found',
+  })
+  @ApiResponse({
+    status: HttpStatus.BAD_REQUEST,
+    description: 'Invalid data or cannot update order',
+  })
   async update(
     id: number,
     updateOrderDto: UpdateOrderDto,
@@ -189,6 +211,12 @@ export class OrderService {
     return this.convertToResponseDto(updatedOrder);
   }
 
+  @ApiOperation({ summary: 'Get all orders' })
+  @ApiResponse({
+    status: HttpStatus.OK,
+    description: 'Returns a list of orders',
+    type: [OrderResponseDto],
+  })
   async findAll(
     cpf: string,
     status: string,
@@ -206,6 +234,16 @@ export class OrderService {
     return orders.map((order) => this.convertToResponseDto(order));
   }
 
+  @ApiOperation({ summary: 'Get a specific order by ID' })
+  @ApiResponse({
+    status: HttpStatus.OK,
+    description: 'Returns the order details',
+    type: OrderResponseDto,
+  })
+  @ApiResponse({
+    status: HttpStatus.NOT_FOUND,
+    description: 'Order not found',
+  })
   async findOne(id: number): Promise<OrderResponseDto> {
     const order = await this.prisma.order.findUnique({ where: { id } });
     if (!order) {
@@ -214,7 +252,20 @@ export class OrderService {
     return this.convertToResponseDto(order);
   }
 
-  async cancelOrder(id: number): Promise<void> {
+  @ApiOperation({ summary: 'Cancel an order' })
+  @ApiResponse({
+    status: HttpStatus.NO_CONTENT,
+    description: 'Order has been successfully cancelled',
+  })
+  @ApiResponse({
+    status: HttpStatus.NOT_FOUND,
+    description: 'Order not found',
+  })
+  @ApiResponse({
+    status: HttpStatus.BAD_REQUEST,
+    description: 'Only open orders can be cancelled',
+  })
+  async cancelOrder(id: number): Promise<{ message: string }> {
     const order = await this.prisma.order.findUnique({ where: { id } });
     if (!order) {
       throw new HttpException('Order not found', HttpStatus.NOT_FOUND);
@@ -230,6 +281,11 @@ export class OrderService {
       where: { id },
       data: { statusOrder: 'cancelled', canceledAt: new Date() },
     });
+    return { message: 'Order cancelled successfully' };
+  }
+
+  async getAllOrders() {
+    return await this.prisma.order.findMany();
   }
 
   private convertToResponseDto(order: Order): OrderResponseDto {

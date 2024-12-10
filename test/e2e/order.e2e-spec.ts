@@ -19,11 +19,11 @@ describe('OrderController (E2E)', () => {
       providers: [OrderService, PrismaService],
     })
       .overrideProvider(axios)
-      .useValue(axiosMock)  
+      .useValue(axiosMock)
       .compile();
 
     app = moduleFixture.createNestApplication();
-    prismaService = app.get(PrismaService); 
+    prismaService = app.get(PrismaService);
     await app.init();
   });
 
@@ -48,7 +48,6 @@ describe('OrderController (E2E)', () => {
       },
     });
 
-    
     const car = await prismaService.car.create({
       data: {
         id: 1,
@@ -143,7 +142,6 @@ describe('OrderController (E2E)', () => {
   });
 
   it('should list orders with pagination', async () => {
-    
     await prismaService.order.create({
       data: {
         clientId: 1,

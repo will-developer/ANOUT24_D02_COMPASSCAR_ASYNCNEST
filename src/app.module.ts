@@ -11,10 +11,11 @@ import { ConfigModule } from '@nestjs/config';
 
 @Module({
   imports: [
+    AuthModule,
     ConfigModule.forRoot({
       isGlobal: true,
     }),
-    CarModule, PrismaModule, UsersModule, ClientsModule, OrderModule, AuthModule],
+    CarModule, PrismaModule, UsersModule, ClientsModule, OrderModule],
   controllers: [AppController],
   providers: [AppService],
 })

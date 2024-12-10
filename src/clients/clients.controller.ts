@@ -12,13 +12,15 @@ import {
 import { ClientsService } from './clients.service';
 import { CreateClientDto } from './dtos/create-client.dto';
 import { UpdateClientDto } from './dtos/update-client.dto';
-import { ApiOperation, ApiResponse } from '@nestjs/swagger';
+import { ApiOperation, ApiResponse, ApiBearerAuth, ApiTags } from '@nestjs/swagger';
 import { Client } from '@prisma/client';
 import { ClientFiltersDto } from './dtos/filters-client.dto';
 import { JwtAuthGuard } from 'src/auth/infrastructure/guards/jwt-auth.guard';
 
+@ApiBearerAuth()
 @UseGuards(JwtAuthGuard)
-@Controller('client')
+@Controller('clients')
+@ApiTags('Clients')
 export class ClientsController {
   constructor(private readonly clientsService: ClientsService) {}
 

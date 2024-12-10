@@ -20,9 +20,12 @@ import { ValidateDatePipe } from '../validation/validate-date.pipe';
 import { ValidateClientPipe } from '../validation/validate-client.pipe';
 import { ValidateCarPipe } from '../validation/validate-car.pipe';
 import { JwtAuthGuard } from 'src/auth/infrastructure/guards/jwt-auth.guard';
+import { ApiBearerAuth, ApiTags } from '@nestjs/swagger';
 
+@ApiBearerAuth()
 @UseGuards(JwtAuthGuard)
 @Controller('orders')
+@ApiTags('Orders')
 export class OrderController {
   constructor(private readonly orderService: OrderService) {}
 

@@ -14,6 +14,7 @@ import {
   ApiForbiddenResponse,
   ApiOperation,
   ApiTags,
+  ApiBearerAuth,
 } from '@nestjs/swagger';
 import { CarService } from './car.service';
 import { CreateCarDto } from './dto/create-car.dto';
@@ -21,6 +22,7 @@ import { UpdateCarDto } from './dto/update-car.dto';
 import { CarFilters } from './filters/carFilters';
 import { JwtAuthGuard } from 'src/auth/infrastructure/guards/jwt-auth.guard';
 
+@ApiBearerAuth()
 @UseGuards(JwtAuthGuard)
 @ApiTags('Cars')
 @Controller('car')

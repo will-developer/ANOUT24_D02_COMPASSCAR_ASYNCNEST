@@ -23,7 +23,7 @@ export class CreateClientDto {
 
   @ApiProperty({
     description: "Customer's CPF",
-    example: '74836512894',
+    example: '64225307301',
   })
   @IsNotEmpty()
   @IsString()

@@ -4,7 +4,6 @@ import { OrderService } from '../../src/order/repository/order.service';
 import { PrismaService } from 'prisma/prisma.service';
 import * as request from 'supertest';
 import { INestApplication } from '@nestjs/common';
-import { mockPrismaService } from './mock-prisma.service';
 import { axiosMock } from './mock-axios';
 import axios from 'axios';
 
@@ -12,20 +11,19 @@ jest.mock('axios');
 
 describe('OrderController (E2E)', () => {
   let app: INestApplication;
+  let prismaService: PrismaService;
 
   beforeEach(async () => {
     const moduleFixture: TestingModule = await Test.createTestingModule({
       controllers: [OrderController],
-      providers: [
-        OrderService,
-        { provide: PrismaService, useValue: mockPrismaService },
-      ],
+      providers: [OrderService, PrismaService],
     })
       .overrideProvider(axios)
-      .useValue(axiosMock)
+      .useValue(axiosMock)  
       .compile();
 
     app = moduleFixture.createNestApplication();
+    prismaService = app.get(PrismaService); 
     await app.init();
   });
 
@@ -50,23 +48,33 @@ describe('OrderController (E2E)', () => {
       },
     });
 
-    mockPrismaService.car.findUnique.mockResolvedValue({
-      id: 1,
-      dailyPrice: 100,
-      status: true,
+    
+    const car = await prismaService.car.create({
+      data: {
+        id: 1,
+        dailyPrice: 100,
+        status: true,
+      },
     });
 
-    mockPrismaService.client.findUnique.mockResolvedValue({
-      id: 1,
-      status: true,
+    const client = await prismaService.client.create({
+      data: {
+        id: 1,
+        status: true,
+      },
     });
 
-    mockPrismaService.order.create.mockResolvedValue({
-      id: 1,
-      ...createOrderDto,
-      rentalFee: 10.04,
-      totalAmount: 10.04,
-      statusOrder: 'open',
+    const createdOrder = await prismaService.order.create({
+      data: {
+        clientId: client.id,
+        carId: car.id,
+        startDate: new Date(),
+        endDate: new Date(),
+        cep: '01310-930',
+        rentalFee: 10.04,
+        totalAmount: 10.04,
+        statusOrder: 'open',
+      },
     });
 
     return request(app.getHttpServer())
@@ -118,9 +126,11 @@ describe('OrderController (E2E)', () => {
       },
     });
 
-    mockPrismaService.car.findUnique.mockResolvedValue({
-      id: 1,
-      status: false,
+    const car = await prismaService.car.create({
+      data: {
+        id: 1,
+        status: false,
+      },
     });
 
     return request(app.getHttpServer())
@@ -133,9 +143,9 @@ describe('OrderController (E2E)', () => {
   });
 
   it('should list orders with pagination', async () => {
-    mockPrismaService.order.findMany.mockResolvedValue([
-      {
-        id: 1,
+    
+    await prismaService.order.create({
+      data: {
         clientId: 1,
         carId: 1,
         startDate: new Date(),
@@ -145,7 +155,7 @@ describe('OrderController (E2E)', () => {
         totalAmount: 100,
         statusOrder: 'open',
       },
-    ]);
+    });
 
     return request(app.getHttpServer())
       .get('/orders')
@@ -165,20 +175,25 @@ describe('OrderController (E2E)', () => {
       statusOrder: 'approved',
     };
 
-    mockPrismaService.order.findUnique.mockResolvedValue({
-      id: 1,
-      clientId: 1,
-      carId: 1,
-      startDate: new Date(),
-      endDate: new Date(),
-      cep: '01310-930',
-      statusOrder: 'open',
+    const order = await prismaService.order.create({
+      data: {
+        clientId: 1,
+        carId: 1,
+        startDate: new Date(),
+        endDate: new Date(),
+        cep: '01310-930',
+        rentalFee: 10.04,
+        totalAmount: 100,
+        statusOrder: 'open',
+      },
     });
 
-    mockPrismaService.car.findUnique.mockResolvedValue({
-      id: 1,
-      dailyPrice: 100,
-      status: true,
+    const car = await prismaService.car.create({
+      data: {
+        id: 1,
+        dailyPrice: 100,
+        status: true,
+      },
     });
 
     axiosMock.get.mockResolvedValue({
@@ -189,14 +204,13 @@ describe('OrderController (E2E)', () => {
       },
     });
 
-    mockPrismaService.order.update.mockResolvedValue({
-      id: 1,
-      statusOrder: 'approved',
-      ...updateOrderDto,
+    const updatedOrder = await prismaService.order.update({
+      where: { id: order.id },
+      data: { ...updateOrderDto, statusOrder: 'approved' },
     });
 
     return request(app.getHttpServer())
-      .put('/orders/1')
+      .put(`/orders/${order.id}`)
       .send(updateOrderDto)
       .expect(200)
       .expect((res) => {
@@ -205,15 +219,26 @@ describe('OrderController (E2E)', () => {
   });
 
   it('should fail when trying to cancel a non-open order', async () => {
-    mockPrismaService.order.findUnique.mockResolvedValue({
-      id: 1,
-      statusOrder: 'approved',
+    const order = await prismaService.order.create({
+      data: {
+        clientId: 1,
+        carId: 1,
+        startDate: new Date(),
+        endDate: new Date(),
+        cep: '01310-930',
+        rentalFee: 10.04,
+        totalAmount: 100,
+        statusOrder: 'approved',
+      },
     });
 
-    await request(app.getHttpServer()).delete('/orders/1').expect(400).expect({
-      statusCode: 400,
-      message: 'Only open orders can be cancelled',
-    });
+    await request(app.getHttpServer())
+      .delete(`/orders/${order.id}`)
+      .expect(400)
+      .expect({
+        statusCode: 400,
+        message: 'Only open orders can be cancelled',
+      });
   });
 
   afterAll(async () => {

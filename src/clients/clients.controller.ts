@@ -7,15 +7,20 @@ import {
   Post,
   Put,
   Query,
+  UseGuards,
 } from '@nestjs/common';
 import { ClientsService } from './clients.service';
 import { CreateClientDto } from './dtos/create-client.dto';
 import { UpdateClientDto } from './dtos/update-client.dto';
-import { ApiOperation, ApiResponse } from '@nestjs/swagger';
+import { ApiOperation, ApiResponse, ApiBearerAuth, ApiTags } from '@nestjs/swagger';
 import { Client } from '@prisma/client';
 import { ClientFiltersDto } from './dtos/filters-client.dto';
+import { JwtAuthGuard } from 'src/auth/infrastructure/guards/jwt-auth.guard';
 
-@Controller('client')
+@ApiBearerAuth()
+@UseGuards(JwtAuthGuard)
+@Controller('clients')
+@ApiTags('Clients')
 export class ClientsController {
   constructor(private readonly clientsService: ClientsService) {}
 

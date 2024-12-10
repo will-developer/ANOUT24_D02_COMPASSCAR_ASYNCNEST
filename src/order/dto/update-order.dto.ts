@@ -21,8 +21,9 @@ export class UpdateOrderDto {
     description: 'Client ID for the order',
     type: Number,
   })
+  @IsOptional()
   @IsInt()
-  clientId: number;
+  clientId?: number;
 
   @ApiProperty({
     description: 'Car ID for the order',
@@ -61,7 +62,7 @@ export class UpdateOrderDto {
 
   @ApiProperty({
     description:
-      'Status of the order (it can be open, closed, approved or cancelled',
+      'Status of the order (it can be open, closed, approved or cancelled)',
     type: String,
   })
   @IsOptional()

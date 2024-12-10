@@ -66,7 +66,7 @@ export class OrderService {
 
       //gets car´s daily price
       const car = await this.prisma.car.findUnique({ where: { id: carId } });
-      if (!car || !car.status) {
+      if (!car || !car.status || isNaN(car.dailyPrice)) {
         throw new HttpException('Car is not available', HttpStatus.BAD_REQUEST);
       }
       const dailyPrice = car.dailyPrice;
@@ -122,6 +122,17 @@ export class OrderService {
     const order = await this.prisma.order.findUnique({ where: { id } });
     if (!order) {
       throw new HttpException('Order not found', HttpStatus.NOT_FOUND);
+    }
+    if (
+      updateOrderDto.statusOrder &&
+      !['open', 'approved', 'cancelled', 'closed'].includes(
+        updateOrderDto.statusOrder,
+      )
+    ) {
+      throw new HttpException(
+        'Invalid status for the order.',
+        HttpStatus.BAD_REQUEST,
+      );
     }
 
     //updates order´s fields
@@ -223,6 +234,12 @@ export class OrderService {
     page: number,
     limit: number,
   ): Promise<OrderResponseDto[]> {
+    if (!page || page < 1) {
+      throw new HttpException('Invalid page number', HttpStatus.BAD_REQUEST);
+    }
+    if (!limit || limit < 1) {
+      throw new HttpException('Invalid limit number', HttpStatus.BAD_REQUEST);
+    }
     const orders = await this.prisma.order.findMany({
       where: {
         ...(cpf && { client: { cpf } }),

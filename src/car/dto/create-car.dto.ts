@@ -9,6 +9,8 @@ import {
   ArrayMinSize,
   IsArray,
   ArrayMaxSize,
+  IsOptional,
+  IsBoolean,
 } from 'class-validator';
 import { ApiProperty } from '@nestjs/swagger';
 import { CreateCarItemDto } from './create-carItem.dto';
@@ -87,4 +89,11 @@ export class CreateCarDto {
   @ArrayMinSize(1, { message: 'At least one item must be provided.' })
   @ArrayMaxSize(5, { message: 'A maximum of five items must be provided.' })
   items: CreateCarItemDto[];
+
+  @ApiProperty({
+    description: 'Status of the car. Defaults to true (active)',
+  })
+  @IsOptional()
+  @IsBoolean({ message: 'Status must be a boolean value.' })
+  status?: boolean;
 }

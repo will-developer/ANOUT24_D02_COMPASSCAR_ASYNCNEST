@@ -5,6 +5,9 @@ import { PrismaService } from 'prisma/prisma.service';
 import { AppModule } from 'src/app.module';
 import { JwtAuthGuard } from '../../src/auth/infrastructure/guards/jwt-auth.guard';
 import { CreateCarDto } from '../../src/car/dto/create-car.dto';
+import { OrderController } from '../../src/order/repository/order.controller';
+import { OrderService } from '../../src/order/repository/order.service';
+import { mockPrismaService } from './mock-prisma.service';
 
 describe('CarService (e2e)', () => {
   let app: INestApplication;
@@ -14,6 +17,11 @@ describe('CarService (e2e)', () => {
     const MockAuthGuard: CanActivate = { canActivate: jest.fn(() => true) };
     const moduleFixture: TestingModule = await Test.createTestingModule({
       imports: [AppModule],
+      controllers: [OrderController],
+      providers: [
+        OrderService,
+        { provide: PrismaService, useValue: mockPrismaService },
+      ],
     })
       .overrideGuard(JwtAuthGuard)
       .useValue(MockAuthGuard)
@@ -24,13 +32,18 @@ describe('CarService (e2e)', () => {
 
     await prisma.carItem.deleteMany();
     await prisma.car.deleteMany();
+    await prisma.client.deleteMany();
 
     await app.init();
   });
 
   afterAll(async () => {
     await prisma.carItem.deleteMany();
+    await prisma.order.deleteMany();
+    await prisma.client.deleteMany();
+
     await prisma.car.deleteMany();
+
     await app.close();
   });
 
@@ -499,12 +512,12 @@ describe('CarService (e2e)', () => {
         });
     });
 
-    it.skip('should filter cars by status false', async () => {
+    it('should filter cars by status false', async () => {
       const car = await prisma.car.create({
         data: {
           brand: 'Test Brand',
           model: 'Test Model',
-          plate: 'DGG-1234',
+          plate: 'BAC-1234',
           year: 2020,
           km: 10000,
           dailyPrice: 150,
@@ -514,14 +527,20 @@ describe('CarService (e2e)', () => {
         },
       });
 
-      await request(app.getHttpServer()).delete(`/car:${car.id}`).expect(200);
+      await request(app.getHttpServer()).delete(`/car/${car.id}`).expect(200);
+
+      const updatedCar = await prisma.car.findUnique({
+        where: { id: car.id },
+      });
+
+      expect(updatedCar.status).toBe(false);
+      expect(updatedCar.inactivatedAt).toBeDefined();
 
       await request(app.getHttpServer())
         .get('/car?status=false')
         .expect(200)
         .expect((res) => {
           expect(res.body.data.length).toBeGreaterThan(0);
-          expect(res.body.data[0].status).toBe('false');
         });
     });
 
@@ -588,6 +607,154 @@ describe('CarService (e2e)', () => {
           expect(res.body.message).toBe('Car not found');
           expect(res.body.error).toBe('Not Found');
         });
+    });
+  });
+
+  describe('CarController (e2e) - DELETE /car/:id', () => {
+    it('should delete a car and set its status to inactive', async () => {
+      const car = await prisma.car.create({
+        data: {
+          brand: 'Test Brand',
+          model: 'Test Model',
+          plate: 'ABC1234',
+          year: 2020,
+          km: 10000,
+          dailyPrice: 150,
+        },
+      });
+
+      const response = await request(app.getHttpServer())
+        .delete(`/car/${car.id}`)
+        .expect(200);
+
+      expect(response.body.message).toBe(
+        `The car with the plate: ${car.plate} has been deleted`,
+      );
+
+      const updatedCar = await prisma.car.findUnique({
+        where: { id: car.id },
+      });
+
+      expect(updatedCar.status).toBe(false);
+      expect(updatedCar.inactivatedAt).toBeDefined();
+    });
+
+    it('should return an error if the car is not found', async () => {
+      await request(app.getHttpServer())
+        .delete('/car/999999')
+        .expect((res) => {
+          expect(res.body.statusCode).toBe(404);
+          expect(res.body.message).toBe('Car not found');
+          expect(res.body.error).toBe('Not Found');
+        });
+    });
+
+    it('should not delete a car if it is part of an open or approved order', async () => {
+      const car = await prisma.car.create({
+        data: {
+          brand: 'Test Brand',
+          model: 'Test Model',
+          plate: 'XXB-1234',
+          year: 2020,
+          km: 10000,
+          dailyPrice: 50,
+        },
+      });
+
+      const client = await prisma.client.create({
+        data: {
+          name: 'teste',
+          cpf: '09977517037',
+          birthDate: '2000-01-01T00:00:00.000Z',
+          email: 'claudiaraia@gmail.com',
+          phone: '13999999999',
+        },
+      });
+
+      const order = await prisma.order.create({
+        data: {
+          client: {
+            connect: {
+              id: client.id,
+            },
+          },
+          car: {
+            connect: {
+              id: car.id,
+            },
+          },
+          startDate: new Date(),
+          endDate: new Date(),
+          cep: '01310-930',
+          statusOrder: 'open',
+          uf: 'SP',
+          city: 'São Paulo',
+          rentalFee: 100,
+          totalAmount: 150,
+        },
+      });
+
+      const response = await request(app.getHttpServer())
+        .delete(`/car/${car.id}`)
+        .expect(400);
+
+      expect(response.body.message).toBe(
+        'It is not possible to delete this car because it is part of an open order, see the order table',
+      );
+    });
+
+    it('should not delete a car if it is part of an open or approved order', async () => {
+      const car = await prisma.car.create({
+        data: {
+          brand: 'Test Brand',
+          model: 'Test Model',
+          plate: 'XXA-1234',
+          year: 2020,
+          km: 10000,
+          dailyPrice: 50,
+        },
+      });
+
+      const client = await prisma.client.create({
+        data: {
+          name: 'teste',
+          cpf: '740.557.103-48',
+          birthDate: '2000-01-01T00:00:00.000Z',
+          email: 'claudia_raia@gmail.com',
+          phone: '13999999999',
+        },
+      });
+
+      await prisma.order.create({
+        data: {
+          client: {
+            connect: {
+              id: client.id,
+            },
+          },
+          car: {
+            connect: {
+              id: car.id,
+            },
+          },
+          startDate: new Date(),
+          endDate: new Date(),
+          cep: '01310-930',
+          statusOrder: 'approved',
+          uf: 'SP',
+          city: 'São Paulo',
+          rentalFee: 100,
+          totalAmount: 150,
+        },
+      });
+
+      const response = await request(app.getHttpServer())
+        .delete(`/car/${car.id}`)
+        .expect(400);
+
+      expect(response.body.message).toBe(
+        'It is not possible to delete this car because it is part of an open order, see the order table',
+      );
     });
   });
 });

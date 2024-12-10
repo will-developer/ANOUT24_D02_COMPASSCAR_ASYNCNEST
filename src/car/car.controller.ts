@@ -8,6 +8,7 @@ import {
   Delete,
   Query,
   UseGuards,
+  ValidationPipe,
 } from '@nestjs/common';
 import {
   ApiResponse,
@@ -42,7 +43,7 @@ export class CarController {
   @ApiForbiddenResponse({
     description: 'Access denied.',
   })
-  create(@Body() createCarDto: CreateCarDto) {
+  create(@Body(new ValidationPipe()) createCarDto: CreateCarDto) {
     return this.carService.create(createCarDto);
   }
 

@@ -38,6 +38,10 @@ export class OrderService {
     return timeDifference / (1000 * 3600 * 24);
   }
 
+  async getAllOrders() {
+    return await this.prisma.order.findMany();
+  }
+
   async create(createOrderDto: CreateOrderDto): Promise<OrderResponseDto> {
     try {
       const { clientId, carId, startDate, endDate, cep } = createOrderDto;
@@ -195,6 +199,9 @@ export class OrderService {
     page: number,
     limit: number,
   ): Promise<OrderResponseDto[]> {
+    if (isNaN(page) || page < 1) page = 1;
+    if (isNaN(limit) || limit < 1) limit = 10;
+
     const orders = await this.prisma.order.findMany({
       where: {
         ...(cpf && { client: { cpf } }),

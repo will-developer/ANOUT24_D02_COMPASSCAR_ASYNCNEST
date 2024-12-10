@@ -102,7 +102,6 @@ export class ClientsController {
   })
   @Get(':id')
   async getClientById(@Param('id', ParseIntPipe) id: number): Promise<Client> {
-    console.log('Received ID:', id, 'Type:', typeof id);
     return this.clientsService.getClientById(id);
   }
 

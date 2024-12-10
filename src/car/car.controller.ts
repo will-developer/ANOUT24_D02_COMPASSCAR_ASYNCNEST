@@ -8,6 +8,7 @@ import {
   Delete,
   Query,
   UseGuards,
+  ValidationPipe,
 } from '@nestjs/common';
 import {
   ApiResponse,
@@ -42,7 +43,7 @@ export class CarController {
   @ApiForbiddenResponse({
     description: 'Access denied.',
   })
-  create(@Body() createCarDto: CreateCarDto) {
+  create(@Body(new ValidationPipe()) createCarDto: CreateCarDto) {
     return this.carService.create(createCarDto);
   }
 
@@ -60,30 +61,30 @@ export class CarController {
     description: 'Access denied.',
   })
   async findAll(
-    @Query('page') page?: number,
-    @Query('limit') limit?: number,
+    @Query('page') page?: string,
+    @Query('limit') limit?: string,
     @Query('brand') brand?: string,
-    @Query('km') km?: number,
-    @Query('year') year?: number,
-    @Query('status') status?: boolean,
-    @Query('dailyPrice') dailyPrice?: number,
+    @Query('km') km?: string,
+    @Query('year') year?: string,
+    @Query('dailyPrice') dailyPrice?: string,
   ) {
-    if (isNaN(page)) {
-      page = 1;
-    }
+    let pageNumber = page ? parseInt(page, 10) : 1;
+    let limitNumber = limit ? parseInt(limit, 10) : 10;
 
-    if (isNaN(limit)) {
-      limit = 10;
-    }
+    if (isNaN(pageNumber) || pageNumber < 1) pageNumber = 1;
+    if (isNaN(limitNumber) || limitNumber < 1) limitNumber = 10;
+
+    const kmNumber = parseInt(km, 10);
+    const yearNumber = parseInt(year, 10);
+    const dailyPriceNumber = parseFloat(dailyPrice);
 
     const filters: CarFilters = {
-      page,
-      limit,
+      page: pageNumber,
+      limit: limitNumber,
       brand,
-      km,
-      year,
-      status,
-      dailyPrice,
+      km: kmNumber,
+      year: yearNumber,
+      dailyPrice: dailyPriceNumber,
     };
 
     return await this.carService.findAll(filters);
@@ -103,7 +104,7 @@ export class CarController {
     description: 'Access denied.',
   })
   findOne(@Param('id') id: string) {
-    return this.carService.findOne(+id);
+    return this.carService.findOne(parseInt(id, 10));
   }
 
   @Patch(':id')
@@ -123,8 +124,11 @@ export class CarController {
   @ApiForbiddenResponse({
     description: 'Access denied.',
   })
-  update(@Param('id') id: string, @Body() updateCarDto: UpdateCarDto) {
-    return this.carService.update(+id, updateCarDto);
+  update(
+    @Param('id') id: string,
+    @Body(new ValidationPipe()) updateCarDto: UpdateCarDto,
+  ) {
+    return this.carService.update(parseInt(id, 10), updateCarDto);
   }
 
   @Delete(':id')
@@ -141,6 +145,6 @@ export class CarController {
     description: 'Access denied.',
   })
   remove(@Param('id') id: string) {
-    return this.carService.remove(+id);
+    return this.carService.remove(parseInt(id, 10));
   }
 }

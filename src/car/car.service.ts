@@ -26,7 +26,7 @@ export class CarService {
     const uniqueArrItems = new Set(arrItems.map((items) => items.name));
 
     if (uniqueArrItems.size !== arrItems.length) {
-      throw new NotFoundException(
+      throw new BadRequestException(
         'Items and accessories cannot be duplicated.',
       );
     }
@@ -61,15 +61,14 @@ export class CarService {
 
   async update(id: number, updateCarDto: UpdateCarDto) {
     const findCar = await this.repository.findCarById(id);
-
-    if (!findCar.status) {
-      throw new NotFoundException(
-        'It is not possible to change a car with inactive status',
-      );
-    }
-
     if (!findCar) {
       throw new NotFoundException('Car not found');
+    }
+
+    if (updateCarDto.status === false) {
+      throw new BadRequestException(
+        'It is not possible to change a car with inactive status',
+      );
     }
 
     return this.repository.update(id, updateCarDto);
@@ -79,7 +78,7 @@ export class CarService {
     const findCar = await this.repository.findCarById(id);
 
     if (!findCar) {
-      throw new BadRequestException('Car not found');
+      throw new NotFoundException('Car not found');
     }
 
     const getAllOrders = await this.orderService.getAllOrders();

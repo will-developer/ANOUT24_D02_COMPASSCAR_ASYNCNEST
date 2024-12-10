@@ -15,7 +15,12 @@ import { PrismaModule } from 'prisma/prisma.module';
     ConfigModule.forRoot({
       isGlobal: true,
     }),
-    CarModule, PrismaModule, UsersModule, ClientsModule, OrderModule],
+    CarModule,
+    PrismaModule,
+    UsersModule,
+    ClientsModule,
+    OrderModule,
+  ],
   controllers: [AppController],
   providers: [AppService],
 })

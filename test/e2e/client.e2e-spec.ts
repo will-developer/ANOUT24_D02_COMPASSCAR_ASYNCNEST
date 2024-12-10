@@ -28,11 +28,6 @@ describe('Client Module (e2e)', () => {
     await app.close();
   });
 
-  beforeEach(async () => {
-    // Limpar banco antes de cada teste
-    await prisma.client.deleteMany({});
-  });
-
   it('should create a new client', async () => {
     const clientData = {
       name: 'John Doe',

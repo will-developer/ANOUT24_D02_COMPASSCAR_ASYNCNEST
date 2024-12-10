@@ -60,25 +60,56 @@ describe('CarService (e2e)', () => {
     });
   });
 
-  describe('All fields are required', () => {
-    it('should return an error if brand is empty', async () => {
-      const createCarDto1 = {
-        brand: '',
-        model: 'Compass',
-        plate: 'XBC-1234',
-        year: 2020,
-        km: 10000,
-        dailyPrice: 200,
-        items: ['Air Conditioning', 'Baby-Seat'],
-      };
+  const invalidPayloads = [
+    { field: 'brand', value: '', message: 'Brand is required.' },
+    { field: 'model', value: '', message: 'Model is required.' },
+    {
+      field: 'plate',
+      value: '',
+      message: [
+        'The plate must be in the correct format, for example: ABC-1D23.',
+        'plate should not be empty',
+      ],
+    },
+    {
+      field: 'km',
+      value: -10,
+      message: 'Kilometers must be greater than or equal to 0.',
+    },
+    {
+      field: 'dailyPrice',
+      value: 0,
+      message: 'Daily price must be greater than 0.',
+    },
+  ];
 
-      await request(app.getHttpServer())
-        .post('/car')
-        .send(createCarDto1)
-        .expect(400)
-        .expect((res) => {
-          expect(res.body.message).toContain('Brand is required.');
-        });
+  describe('Validation errors', () => {
+    invalidPayloads.forEach(({ field, value, message }) => {
+      it(`should return an error if ${field} is invalid`, async () => {
+        const payload = {
+          brand: 'Jeep',
+          model: 'Compass',
+          plate: 'XBC-1234',
+          year: 2020,
+          km: 10000,
+          dailyPrice: 200,
+          items: ['Air Conditioning', 'Baby-Seat'],
+        };
+
+        payload[field] = value;
+
+        await request(app.getHttpServer())
+          .post('/car')
+          .send(payload)
+          .expect(400)
+          .expect((res) => {
+            if (Array.isArray(message)) {
+              expect(res.body.message).toEqual(expect.arrayContaining(message));
+            } else {
+              expect(res.body.message).toContain(message);
+            }
+          });
+      });
     });
   });
 

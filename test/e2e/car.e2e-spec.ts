@@ -298,5 +298,20 @@ describe('CarService (e2e)', () => {
           expect(res.body.dailyPrice).toBe(180);
         });
     });
+
+    it('should return an error if the car does not exist', async () => {
+      const updateCarDto = {
+        brand: 'Ford',
+        model: 'Fusion',
+      };
+
+      await request(app.getHttpServer())
+        .patch('/car/9999')
+        .send(updateCarDto)
+        .expect(404)
+        .expect((res) => {
+          expect(res.body.message).toContain('Car not found');
+        });
+    });
   });
 });

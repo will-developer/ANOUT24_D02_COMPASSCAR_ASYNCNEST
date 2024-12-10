@@ -11,6 +11,8 @@ import { UserRepository } from './repository/user.repository';
 import { CreateUserDTO } from './dto/create-user.dto';
 import { UpdateUserDTO } from './dto/update-user.dto';
 
+const saltRounds = 10;
+
 @Injectable()
 export class UsersService {
   constructor(private userRepository: UserRepository) {}
@@ -21,7 +23,7 @@ export class UsersService {
       throw new ConflictException('user already registered.');
     }
 
-    const hashedPassword = await bcrypt.hash(dto.password, 10);
+    const hashedPassword = await bcrypt.hash(dto.password, saltRounds);
 
     try {
       return this.userRepository.create({
@@ -49,7 +51,7 @@ export class UsersService {
     }
 
     if (dto.password) {
-      dto.password = await bcrypt.hash(dto.password, 10);
+      dto.password = await bcrypt.hash(dto.password, saltRounds);
     }
 
     try {

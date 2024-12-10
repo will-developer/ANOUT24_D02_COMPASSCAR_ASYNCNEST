@@ -8,7 +8,9 @@ import {
   Patch,
   Post,
   Query,
+  UseGuards,
   ValidationPipe,
+  Request,
 } from '@nestjs/common';
 import { CreateUserDTO } from './dto/create-user.dto';
 import { UsersService } from './users.service';
@@ -19,13 +21,18 @@ import {
   ApiQuery,
   ApiResponse,
   ApiTags,
+  ApiBearerAuth,
 } from '@nestjs/swagger';
+import { JwtAuthGuard } from 'src/auth/infrastructure/guards/jwt-auth.guard';
 
+@ApiBearerAuth()
+@UseGuards(JwtAuthGuard)
 @Controller('users')
 @ApiTags('Users')
 export class UsersController {
   constructor(private readonly usersService: UsersService) {}
 
+  
   @Post()
   @ApiResponse({
     status: HttpStatus.CREATED,
@@ -52,6 +59,7 @@ export class UsersController {
     return this.usersService.createUser(dto);
   }
 
+  
   @Patch(':id')
   @ApiResponse({
     status: HttpStatus.OK,
@@ -106,6 +114,7 @@ export class UsersController {
     return this.usersService.updateUser(+id, dto);
   }
 
+  
   @Get()
   @ApiQuery({
     name: 'page',
@@ -154,6 +163,7 @@ export class UsersController {
     return this.usersService.findAll(query, query.page, query.limit);
   }
 
+  
   @Get(':id')
   @ApiResponse({
     status: HttpStatus.OK,
@@ -173,6 +183,7 @@ export class UsersController {
     return this.usersService.findById(+id);
   }
 
+  
   @Delete(':id')
   @ApiResponse({
     status: HttpStatus.OK,
@@ -190,5 +201,20 @@ export class UsersController {
   })
   async delete(@Param('id') id: number) {
     return this.usersService.inativateUser(+id);
+  }
+
+  @ApiOperation({ summary: 'Get user profile' })
+  @ApiResponse({ 
+    status: 200, 
+    description: 'Returns the user profile'
+  })
+  @ApiResponse({ 
+    status: 401, 
+    description: 'Unauthorized - Invalid or missing token'
+  })
+  @UseGuards(JwtAuthGuard)
+  @Get('profile')
+  getProfile(@Request() req) {
+    return req.user;
   }
 }

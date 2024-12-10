@@ -12,20 +12,18 @@ async function bootstrap() {
       'An API used to rent cars, allows a user to register their customers, check available cars and make rental requests.',
     )
     .setVersion('1.0')
-    .addTag('Client')
+    .addBearerAuth()
     .build();
   const documentFactory = () => SwaggerModule.createDocument(app, config);
   SwaggerModule.setup('api', app, documentFactory);
 
   app.useGlobalPipes(
     new ValidationPipe({
-      whitelist: true,
       transform: true,
-      forbidNonWhitelisted: true,
     }),
   );
 
-  await app.listen(process.env.PORT ?? 3000);
+  await app.listen(3000);
 }
 
 bootstrap();

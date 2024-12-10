@@ -13,4 +13,3 @@ export class CarEntity implements Car {
   updatedAt: Date;
   inactivatedAt: Date;
 }
-//todo: precisará integrar junto com a entidade de Orders

@@ -32,7 +32,6 @@ import { JwtAuthGuard } from 'src/auth/infrastructure/guards/jwt-auth.guard';
 export class UsersController {
   constructor(private readonly usersService: UsersService) {}
 
-  
   @Post()
   @ApiResponse({
     status: HttpStatus.CREATED,
@@ -59,7 +58,6 @@ export class UsersController {
     return this.usersService.createUser(dto);
   }
 
-  
   @Patch(':id')
   @ApiResponse({
     status: HttpStatus.OK,
@@ -114,7 +112,6 @@ export class UsersController {
     return this.usersService.updateUser(+id, dto);
   }
 
-  
   @Get()
   @ApiQuery({
     name: 'page',
@@ -160,10 +157,19 @@ export class UsersController {
       'Fetches a paginated list of users based on optional query parameters like page, limit, name, email, and status. Returns user data if found or an error if not.',
   })
   async findAll(@Query() query) {
-    return this.usersService.findAll(query, query.page, query.limit);
+    const status =
+      query.status === 'true'
+        ? true
+        : query.status === 'false'
+          ? false
+          : undefined;
+    return this.usersService.findAll(
+      { ...query, status },
+      query.page,
+      query.limit,
+    );
   }
 
-  
   @Get(':id')
   @ApiResponse({
     status: HttpStatus.OK,
@@ -183,7 +189,6 @@ export class UsersController {
     return this.usersService.findById(+id);
   }
 
-  
   @Delete(':id')
   @ApiResponse({
     status: HttpStatus.OK,
@@ -204,13 +209,13 @@ export class UsersController {
   }
 
   @ApiOperation({ summary: 'Get user profile' })
-  @ApiResponse({ 
-    status: 200, 
-    description: 'Returns the user profile'
+  @ApiResponse({
+    status: 200,
+    description: 'Returns the user profile',
   })
-  @ApiResponse({ 
-    status: 401, 
-    description: 'Unauthorized - Invalid or missing token'
+  @ApiResponse({
+    status: 401,
+    description: 'Unauthorized - Invalid or missing token',
   })
   @UseGuards(JwtAuthGuard)
   @Get('profile')

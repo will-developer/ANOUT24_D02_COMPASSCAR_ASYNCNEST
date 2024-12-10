@@ -313,5 +313,37 @@ describe('CarService (e2e)', () => {
           expect(res.body.message).toContain('Car not found');
         });
     });
+
+    it('should not allow changing the car status', async () => {
+      const createdCar = await prisma.car.create({
+        data: {
+          brand: 'Test Brand',
+          model: 'Test Model',
+          plate: 'XDX-1234',
+          year: 2020,
+          km: 10000,
+          dailyPrice: 150,
+          items: {
+            create: [{ name: 'Air Conditioning' }, { name: 'GPS' }],
+          },
+        },
+      });
+
+      const updateCarDto = {
+        brand: 'Fiat',
+        model: 'Uno',
+        status: false,
+      };
+
+      await request(app.getHttpServer())
+        .patch(`/car/${createdCar.id}`)
+        .send(updateCarDto)
+        .expect(400)
+        .expect((res) => {
+          expect(res.body.message).toContain(
+            'It is not possible to change a car with inactive status',
+          );
+        });
+    });
   });
 });

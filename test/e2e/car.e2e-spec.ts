@@ -1,6 +1,6 @@
 import { Test, TestingModule } from '@nestjs/testing';
 import * as request from 'supertest';
-import { Body, CanActivate, INestApplication } from '@nestjs/common';
+import { CanActivate, INestApplication } from '@nestjs/common';
 import { PrismaService } from 'prisma/prisma.service';
 import { AppModule } from 'src/app.module';
 import { JwtAuthGuard } from '../../src/auth/infrastructure/guards/jwt-auth.guard';
@@ -70,6 +70,81 @@ describe('CarService (e2e)', () => {
         .post('/car')
         .send(createCarDtoComplete)
         .expect(400);
+    });
+  });
+
+  describe('Validation errors for items', () => {
+    it('should return an error if items contain duplicates', async () => {
+      const payload = {
+        brand: 'Jeep',
+        model: 'Compass',
+        plate: 'BBC-1234',
+        year: 2020,
+        km: 10000,
+        dailyPrice: 200,
+        items: [{ name: 'Air-Condition' }, { name: 'Air-Condition' }],
+      };
+
+      await request(app.getHttpServer())
+        .post('/car')
+        .send(payload)
+        .expect(400)
+        .expect((res) => {
+          expect(res.body.message).toContain(
+            'Items must be between 1 and 5 and cannot contain duplicates.',
+          );
+        });
+    });
+
+    it('should return an error if no items are provided', async () => {
+      const payload = {
+        brand: 'Jeep',
+        model: 'Compass',
+        plate: 'XBA-1234',
+        year: 2020,
+        km: 10000,
+        dailyPrice: 200,
+        items: [],
+      };
+
+      await request(app.getHttpServer())
+        .post('/car')
+        .send(payload)
+        .expect(400)
+        .expect((res) => {
+          expect(res.body.message).toContain(
+            'At least one item must be provided.',
+          );
+        });
+    });
+
+    it('should return an error if more than five items are provided', async () => {
+      const payload = {
+        brand: 'Jeep',
+        model: 'Compass',
+        plate: 'ABZ-1234',
+        year: 2020,
+        km: 10000,
+        dailyPrice: 200,
+        items: [
+          { name: 'GPS' },
+          { name: 'A' },
+          { name: 'B' },
+          { name: 'C' },
+          { name: 'D' },
+          { name: 'E' },
+        ],
+      };
+
+      await request(app.getHttpServer())
+        .post('/car')
+        .send(payload)
+        .expect(400)
+        .expect((res) => {
+          expect(res.body.message).toContain(
+            'A maximum of five items must be provided.',
+          );
+        });
     });
   });
 

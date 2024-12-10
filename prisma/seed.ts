@@ -5,10 +5,8 @@ import * as dotenv from 'dotenv';
 
 dotenv.config();
 
-// Initialize config service with process.env
 const configService = new ConfigService(process.env);
 const databaseUrl = configService.get('DATABASE_URL');
-console.log(databaseUrl);
 const prisma = new PrismaService({datasources: {db: {url: databaseUrl}}});
 
 async function main() {

@@ -548,4 +548,46 @@ describe('CarService (e2e)', () => {
         });
     });
   });
+
+  describe('GET /car/:id', () => {
+    it('should return a car by ID (active or inactive)', async () => {
+      const car = await prisma.car.create({
+        data: {
+          brand: 'Test Brand',
+          model: 'Test Model',
+          plate: 'DII-1234',
+          year: 2020,
+          km: 10000,
+          dailyPrice: 150,
+          items: {
+            create: [{ name: 'Air Conditioning' }, { name: 'GPS' }],
+          },
+        },
+      });
+      const response = await request(app.getHttpServer())
+        .get(`/car/${car.id}`)
+        .expect(200);
+
+      expect(response.body.id).toBe(car.id);
+      expect(response.body.brand).toBe('Test Brand');
+      expect(response.body.model).toBe('Test Model');
+      expect(response.body.plate).toBe('DII-1234');
+      expect(response.body.km).toBe(10000);
+      expect(response.body.dailyPrice).toBe(150);
+      expect(response.body.items).toHaveLength(2);
+      expect(response.body.items[0].name).toBe('Air Conditioning');
+      expect(response.body.items[1].name).toBe('GPS');
+    });
+
+    it('should return an error if the car is not found', async () => {
+      await request(app.getHttpServer())
+        .get('/car/999999')
+        .expect(404)
+        .expect((res) => {
+          expect(res.body.statusCode).toBe(404);
+          expect(res.body.message).toBe('Car not found');
+          expect(res.body.error).toBe('Not Found');
+        });
+    });
+  });
 });

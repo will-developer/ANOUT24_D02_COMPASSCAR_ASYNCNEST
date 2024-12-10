@@ -81,4 +81,38 @@ describe('CarService (e2e)', () => {
         });
     });
   });
+
+  describe('POST /car invalid cases', () => {
+    it('should not create new car if plate is used for other car', async () => {
+      const createCarDto1 = {
+        brand: 'Jeep',
+        model: 'Compass',
+        plate: `ABC-1444`,
+        year: 2020,
+        km: 10000,
+        dailyPrice: 200,
+        items: [{ name: 'Air Conditioning' }, { name: 'Baby-Seat' }],
+      };
+
+      const createCarDto2 = {
+        brand: 'Fiat',
+        model: 'Uno',
+        plate: `ABC-1444`,
+        year: 2020,
+        km: 10000,
+        dailyPrice: 200,
+        items: [{ name: 'Air Conditioning' }, { name: 'Baby-Seat' }],
+      };
+
+      await request(app.getHttpServer())
+        .post('/car')
+        .send(createCarDto1)
+        .expect(201);
+
+      await request(app.getHttpServer())
+        .post('/car')
+        .send(createCarDto2)
+        .expect(400);
+    });
+  });
 });

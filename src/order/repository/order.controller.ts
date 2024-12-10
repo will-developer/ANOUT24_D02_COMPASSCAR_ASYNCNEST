@@ -11,6 +11,7 @@ import {
   UsePipes,
   HttpStatus,
   HttpException,
+  UseGuards,
 } from '@nestjs/common';
 import { OrderService } from './order.service';
 import { CreateOrderDto } from '../dto/create-order.dto';
@@ -19,7 +20,10 @@ import { OrderResponseDto } from '../dto/order-response.dto';
 import { ValidateDatePipe } from '../validation/validate-date.pipe';
 import { ValidateClientPipe } from '../validation/validate-client.pipe';
 import { ValidateCarPipe } from '../validation/validate-car.pipe';
+import { JwtAuthGuard } from 'src/auth/infrastructure/guards/jwt-auth.guard';
 
+@ApiBearerAuth()
+@UseGuards(JwtAuthGuard)
 @Controller('orders')
 export class OrderController {
   constructor(private readonly orderService: OrderService) {}

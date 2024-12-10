@@ -23,7 +23,7 @@ export class CreateClientDto {
 
   @ApiProperty({
     description: "Customer's CPF",
-    example: '123.456.789-10',
+    example: '64225307301',
   })
   @IsNotEmpty()
   @IsString()
@@ -33,7 +33,7 @@ export class CreateClientDto {
 
   @ApiProperty({
     description: "Customer's date of birth",
-    example: '1994-01-01',
+    example: '2000-01-01',
   })
   @IsNotEmpty()
   @Type(() => Date)
@@ -41,7 +41,7 @@ export class CreateClientDto {
 
   @ApiProperty({
     description: "Customer's e-mail",
-    example: 'john@mail.com',
+    example: 'doe@mail.com',
   })
   @IsNotEmpty()
   @IsEmail()

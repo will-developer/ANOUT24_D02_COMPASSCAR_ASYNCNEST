@@ -100,6 +100,7 @@ export class UsersService {
         status: false,
         inactivatedAt: new Date(),
       });
+      // return 'user deactivated successfully';
     } catch (error) {
       throw new InternalServerErrorException();
     }

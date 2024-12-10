@@ -264,5 +264,39 @@ describe('CarService (e2e)', () => {
           expect(res.body.message).toContain('Model is required.');
         });
     });
+
+    it('should successfully update the car when valid fields are provided', async () => {
+      const createdCar = await prisma.car.create({
+        data: {
+          brand: 'Test Brand',
+          model: 'Test Model',
+          plate: 'ADX-1234',
+          year: 2020,
+          km: 10000,
+          dailyPrice: 150,
+          items: {
+            create: [{ name: 'Air Conditioning' }, { name: 'GPS' }],
+          },
+        },
+      });
+
+      const updateCarDto = {
+        brand: 'Fiat',
+        model: 'Uno',
+        km: 12000,
+        dailyPrice: 180,
+      };
+
+      await request(app.getHttpServer())
+        .patch(`/car/${createdCar.id}`)
+        .send(updateCarDto)
+        .expect(200)
+        .expect((res) => {
+          expect(res.body.brand).toBe('Fiat');
+          expect(res.body.model).toBe('Uno');
+          expect(res.body.km).toBe(12000);
+          expect(res.body.dailyPrice).toBe(180);
+        });
+    });
   });
 });

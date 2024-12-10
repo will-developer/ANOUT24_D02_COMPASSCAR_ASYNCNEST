@@ -345,5 +345,40 @@ describe('CarService (e2e)', () => {
           );
         });
     });
+
+    it('should update the car and save the update date', async () => {
+      const createdCar = await prisma.car.create({
+        data: {
+          brand: 'Test Brand',
+          model: 'Test Model',
+          plate: 'XDD-1234',
+          year: 2020,
+          km: 10000,
+          dailyPrice: 150,
+          items: {
+            create: [{ name: 'Air Conditioning' }, { name: 'GPS' }],
+          },
+        },
+      });
+
+      const updateCarDto = {
+        brand: 'Honda',
+        model: 'Civic',
+      };
+
+      const beforeUpdate = new Date();
+
+      await request(app.getHttpServer())
+        .patch(`/car/${createdCar.id}`)
+        .send(updateCarDto)
+        .expect(200)
+        .expect((res) => {
+          expect(new Date(res.body.updatedAt).getTime()).toBeGreaterThan(
+            beforeUpdate.getTime(),
+          );
+          expect(res.body.brand).toBe('Honda');
+          expect(res.body.model).toBe('Civic');
+        });
+    });
   });
 });

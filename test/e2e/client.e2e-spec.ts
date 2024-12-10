@@ -1,5 +1,5 @@
 import { Test, TestingModule } from '@nestjs/testing';
-import { INestApplication } from '@nestjs/common';
+import { CanActivate, INestApplication } from '@nestjs/common';
 import * as request from 'supertest';
 import { PrismaService } from 'prisma/prisma.service';
 import { AppModule } from 'src/app.module';
@@ -9,9 +9,13 @@ describe('Client Module (e2e)', () => {
   let prisma: PrismaService;
 
   beforeAll(async () => {
+    const MockAuthGuard: CanActivate = { canActivate: jest.fn(() => true) };
     const moduleFixture: TestingModule = await Test.createTestingModule({
       imports: [AppModule],
-    }).compile();
+    })
+      .overrideGuard(APP_GUARD)
+      .useValue(MockAuthGuard)
+      .compile();
 
     app = moduleFixture.createNestApplication();
     prisma = moduleFixture.get(PrismaService);

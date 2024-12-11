@@ -8,6 +8,7 @@ import {
   IsNumber,
   IsPositive,
   Max,
+  IsBoolean,
 } from 'class-validator';
 
 export class CarFiltersDto {
@@ -78,4 +79,8 @@ export class CarFiltersDto {
   @IsOptional()
   @Transform(({ value }) => parseFloat(value), { toClassOnly: true })
   dailyPrice?: number;
+
+  @IsOptional()
+  @IsBoolean()
+  status?: boolean;
 }

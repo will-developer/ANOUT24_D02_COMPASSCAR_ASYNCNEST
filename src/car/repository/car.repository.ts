@@ -2,8 +2,8 @@ import { BadRequestException, Injectable } from '@nestjs/common';
 import { CreateCarDto } from '../dto/create-car.dto';
 import { CarEntity } from '../entities/car.entity';
 import { UpdateCarDto } from '../dto/update-car.dto';
-import { CarFilters } from '../filters/carFilters';
 import { PrismaService } from 'prisma/prisma.service';
+import { CarFiltersDto } from '../dto/filters-car.dto';
 
 @Injectable()
 export class CarRepository {
@@ -31,7 +31,7 @@ export class CarRepository {
   }
 
   async findAll(
-    filters: CarFilters,
+    filters: CarFiltersDto,
   ): Promise<{ data: CarEntity[]; total: number; totalPages?: number }> {
     const skip = (filters.page - 1) * filters.limit;
     const where = {

@@ -24,7 +24,15 @@ describe('Client Module (e2e)', () => {
     await app.init();
   });
 
+  beforeEach(async () => {
+    await prisma.client.deleteMany();
+  });
+
   afterAll(async () => {
+    await prisma.carItem.deleteMany();
+    await prisma.order.deleteMany();
+    await prisma.client.deleteMany();
+    await prisma.car.deleteMany();
     await app.close();
   });
 
@@ -38,7 +46,7 @@ describe('Client Module (e2e)', () => {
     };
 
     const response = await request(app.getHttpServer())
-      .post('/client')
+      .post('/clients')
       .send(clientData)
       .expect(201);
 
@@ -50,21 +58,21 @@ describe('Client Module (e2e)', () => {
   it('should get a client by id', async () => {
     const clientData = {
       name: 'John Doe',
-      cpf: '74836512894',
+      cpf: '98293985011',
       birthDate: '2000-01-01T00:00:00.000Z',
-      email: 'john@mail.com',
+      email: 'doe@mail.com',
       phone: '11123456789',
     };
 
     const createdClient = await request(app.getHttpServer())
-      .post('/client')
+      .post('/clients')
       .send(clientData)
       .expect(201);
 
     const clientId = createdClient.body.id;
 
     const response = await request(app.getHttpServer())
-      .get(`/client/${clientId}`)
+      .get(`/clients/${clientId}`)
       .expect(200);
 
     expect(response.body.name).toBe(clientData.name);
@@ -82,7 +90,7 @@ describe('Client Module (e2e)', () => {
     };
 
     const createResponse = await request(app.getHttpServer())
-      .post('/client')
+      .post('/clients')
       .send(clientData)
       .expect(201);
 
@@ -100,7 +108,7 @@ describe('Client Module (e2e)', () => {
     };
 
     const response = await request(app.getHttpServer())
-      .get('/client')
+      .get('/clients')
       .query(filters)
       .expect(200);
 
@@ -121,7 +129,7 @@ describe('Client Module (e2e)', () => {
     };
 
     const createResponse = await request(app.getHttpServer())
-      .post('/client')
+      .post('/clients')
       .send(clientData)
       .expect(201);
 
@@ -133,7 +141,7 @@ describe('Client Module (e2e)', () => {
     };
 
     const updateResponse = await request(app.getHttpServer())
-      .put(`/client/${clientId}`)
+      .put(`/clients/${clientId}`)
       .send(updatedData)
       .expect(200);
 
@@ -152,14 +160,14 @@ describe('Client Module (e2e)', () => {
     };
 
     const createResponse = await request(app.getHttpServer())
-      .post('/client')
+      .post('/clients')
       .send(clientData)
       .expect(201);
 
     const clientId = createResponse.body.id;
 
     const deleteResponse = await request(app.getHttpServer())
-      .delete(`/client/${clientId}`)
+      .delete(`/clients/${clientId}`)
       .expect(200);
 
     expect(deleteResponse.body.message).toBe('Client successfully deleted');

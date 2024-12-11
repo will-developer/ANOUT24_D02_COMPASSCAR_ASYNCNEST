@@ -38,6 +38,7 @@ export class CarRepository {
       ...(filters.brand && { brand: { contains: filters.brand } }),
       ...(filters.km && { km: { lte: filters.km } }),
       ...(filters.year && { year: { gte: filters.year } }),
+      ...(filters.status !== undefined && { status: filters.status }),
       ...(filters.dailyPrice && { dailyPrice: { lte: filters.dailyPrice } }),
     };
 

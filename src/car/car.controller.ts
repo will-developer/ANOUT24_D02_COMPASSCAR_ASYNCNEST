@@ -62,12 +62,20 @@ export class CarController {
   })
   async findAll(@Query() filters: CarFiltersDto) {
     const carFilters: CarFiltersDto = {
-      page: filters.page,
-      limit: filters.limit,
+      page: filters.page ? parseInt(filters.page as unknown as string, 10) : 1,
+      limit: filters.limit
+        ? parseInt(filters.limit as unknown as string, 10)
+        : 10,
       brand: filters.brand,
-      km: filters.km,
-      year: filters.year,
-      dailyPrice: filters.dailyPrice,
+      km: filters.km
+        ? parseInt(filters.km as unknown as string, 10)
+        : undefined,
+      year: filters.year
+        ? parseInt(filters.year as unknown as string, 10)
+        : undefined,
+      dailyPrice: filters.dailyPrice
+        ? parseFloat(filters.dailyPrice as unknown as string)
+        : undefined,
     };
 
     return await this.carService.findAll(carFilters);

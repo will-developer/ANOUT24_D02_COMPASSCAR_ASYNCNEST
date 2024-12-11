@@ -6,8 +6,8 @@ import {
 import { CreateCarDto } from './dto/create-car.dto';
 import { UpdateCarDto } from './dto/update-car.dto';
 import { CarRepository } from './repository/car.repository';
-import { CarFilters } from './filters/carFilters';
 import { OrderService } from '../order/repository/order.service';
+import { CarFiltersDto } from './dto/filters-car.dto';
 
 @Injectable()
 export class CarService {
@@ -34,7 +34,7 @@ export class CarService {
     return this.repository.create(createCarDto);
   }
 
-  async findAll(filters: CarFilters) {
+  async findAll(filters: CarFiltersDto) {
     if (filters.page < 1 || filters.limit < 1) {
       throw new BadRequestException(
         'Page and limit must be greater than zero.',

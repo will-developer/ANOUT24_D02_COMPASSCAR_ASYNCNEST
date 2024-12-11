@@ -20,10 +20,8 @@ import {
 import { CarService } from './car.service';
 import { CreateCarDto } from './dto/create-car.dto';
 import { UpdateCarDto } from './dto/update-car.dto';
-import { CarFilters } from './filters/carFilters';
 import { JwtAuthGuard } from 'src/auth/infrastructure/guards/jwt-auth.guard';
 import { CarFiltersDto } from './dto/filters-car.dto';
-import { filter } from 'rxjs';
 
 @ApiBearerAuth()
 @UseGuards(JwtAuthGuard)
@@ -63,7 +61,7 @@ export class CarController {
     description: 'Access denied.',
   })
   async findAll(@Query() filters: CarFiltersDto) {
-    const carFilters: CarFilters = {
+    const carFilters: CarFiltersDto = {
       page: filters.page,
       limit: filters.limit,
       brand: filters.brand,

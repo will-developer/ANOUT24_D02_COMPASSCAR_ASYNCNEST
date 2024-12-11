@@ -11,7 +11,7 @@ export class UpdateUserDTO {
   name?: string;
 
   @IsOptional()
-  @IsEmail()
+  @IsEmail({}, { message: 'please provide a valid email address' })
   @ApiProperty({
     description: 'email of a user',
     example: 'john.doe@gmail.com',

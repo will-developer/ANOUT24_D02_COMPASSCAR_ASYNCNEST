@@ -17,7 +17,7 @@ export class CreateUserDTO {
   })
   name: string;
 
-  @IsEmail()
+  @IsEmail({}, { message: 'please provide a valid email address' })
   @IsNotEmpty()
   @ApiProperty({
     description: 'email',

@@ -1,6 +1,14 @@
 import { ApiProperty } from '@nestjs/swagger';
 import { Transform } from 'class-transformer';
-import { IsOptional, IsString, IsInt, Min } from 'class-validator';
+import {
+  IsOptional,
+  IsString,
+  IsInt,
+  Min,
+  IsNumber,
+  IsPositive,
+  Max,
+} from 'class-validator';
 
 export class CarFiltersDto {
   @ApiProperty({
@@ -32,30 +40,42 @@ export class CarFiltersDto {
   @IsString()
   brand?: string;
 
+  @IsNumber()
+  @IsPositive()
   @ApiProperty({
     required: false,
-    type: String,
+    type: Number,
     description: 'Car mileage',
   })
   @IsOptional()
-  @Transform(({ value }) => parseInt(value, 10), { toClassOnly: true }) // Converte para número
+  @Transform(({ value }) => parseInt(value, 10), { toClassOnly: true })
   km?: number;
 
+  @Min(new Date().getFullYear() - 10, {
+    message: 'The car must be at most 10 years old.',
+  })
+  @Max(new Date().getFullYear() + 1, {
+    message: 'The car year cannot be in the future.',
+  })
+  @IsNumber()
+  @IsPositive()
   @ApiProperty({
     required: false,
-    type: String,
+    type: Number,
     description: 'Car year',
   })
   @IsOptional()
-  @Transform(({ value }) => parseInt(value, 10), { toClassOnly: true }) // Converte para número
+  @Transform(({ value }) => parseInt(value, 10), { toClassOnly: true })
   year?: number;
 
+  @IsNumber()
+  @IsPositive()
   @ApiProperty({
     required: false,
-    type: String,
+    type: Number,
     description: 'Cars daily price',
   })
   @IsOptional()
-  @Transform(({ value }) => parseFloat(value), { toClassOnly: true }) // Converte para float
+  @Transform(({ value }) => parseFloat(value), { toClassOnly: true })
   dailyPrice?: number;
 }

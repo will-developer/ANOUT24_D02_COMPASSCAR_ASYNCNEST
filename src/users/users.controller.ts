@@ -16,7 +16,6 @@ import { CreateUserDTO } from './dto/create-user.dto';
 import { UsersService } from './users.service';
 import { UpdateUserDTO } from './dto/update-user.dto';
 import {
-  ApiBody,
   ApiOperation,
   ApiQuery,
   ApiResponse,
@@ -71,34 +70,6 @@ export class UsersController {
   @ApiResponse({
     status: HttpStatus.INTERNAL_SERVER_ERROR,
     description: 'internal server error',
-  })
-  @ApiBody({
-    description: 'request body to update some user data',
-    required: true,
-    examples: {
-      allData: {
-        description: 'update all user data',
-        value: {
-          type: UpdateUserDTO,
-          name: 'John',
-          email: 'joe@email.com',
-          password: 'newpassword123',
-        },
-      },
-      justTwoData: {
-        description: 'update only name and email',
-        value: {
-          name: 'John',
-          email: 'john@email.com',
-        },
-      },
-      justOneData: {
-        description: 'update only password',
-        value: {
-          password: 'newpassword123',
-        },
-      },
-    },
   })
   @ApiOperation({
     summary: 'update user information by ID',
@@ -206,20 +177,5 @@ export class UsersController {
   })
   async delete(@Param('id') id: number) {
     return this.usersService.inativateUser(+id);
-  }
-
-  @ApiOperation({ summary: 'Get user profile' })
-  @ApiResponse({
-    status: 200,
-    description: 'Returns the user profile',
-  })
-  @ApiResponse({
-    status: 401,
-    description: 'Unauthorized - Invalid or missing token',
-  })
-  @UseGuards(JwtAuthGuard)
-  @Get('profile')
-  getProfile(@Request() req) {
-    return req.user;
   }
 }

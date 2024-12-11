@@ -25,7 +25,7 @@ export class UsersService {
     const hashedPassword = await bcrypt.hash(dto.password, saltRounds);
 
     try {
-      return this.userRepository.create({
+      const createdUser = await this.userRepository.create({
         name: dto.name,
         email: dto.email,
         password: hashedPassword,
@@ -33,6 +33,9 @@ export class UsersService {
         createdAt: new Date(),
         updatedAt: new Date(),
       });
+      const { password, ...userWithoutPassword } = createdUser;
+      return userWithoutPassword;
+
     } catch (error) {
       throw new InternalServerErrorException();
     }
@@ -54,10 +57,12 @@ export class UsersService {
     }
 
     try {
-      return this.userRepository.update(id, {
+      const updatedUser = await this.userRepository.update(id, {
         ...dto,
         updatedAt: new Date(),
       });
+      const { password, ...userWithoutPassword } = updatedUser;
+      return userWithoutPassword;
     } catch (error) {
       throw new InternalServerErrorException();
     }
@@ -95,11 +100,11 @@ export class UsersService {
     if (!user) throw new NotFoundException('user not found.');
 
     try {
-      return this.userRepository.update(id, {
+      this.userRepository.update(id, {
         status: false,
         inactivatedAt: new Date(),
       });
-      // return 'user deactivated successfully';
+      return 'user deactivated successfully';
     } catch (error) {
       throw new InternalServerErrorException();
     }

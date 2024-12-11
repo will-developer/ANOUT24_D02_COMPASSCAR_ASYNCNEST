@@ -22,6 +22,8 @@ import { CreateCarDto } from './dto/create-car.dto';
 import { UpdateCarDto } from './dto/update-car.dto';
 import { CarFilters } from './filters/carFilters';
 import { JwtAuthGuard } from 'src/auth/infrastructure/guards/jwt-auth.guard';
+import { CarFiltersDto } from './dto/filters-car.dto';
+import { filter } from 'rxjs';
 
 @ApiBearerAuth()
 @UseGuards(JwtAuthGuard)
@@ -60,34 +62,17 @@ export class CarController {
   @ApiForbiddenResponse({
     description: 'Access denied.',
   })
-  async findAll(
-    @Query('page') page?: string,
-    @Query('limit') limit?: string,
-    @Query('brand') brand?: string,
-    @Query('km') km?: string,
-    @Query('year') year?: string,
-    @Query('dailyPrice') dailyPrice?: string,
-  ) {
-    let pageNumber = page ? parseInt(page, 10) : 1;
-    let limitNumber = limit ? parseInt(limit, 10) : 10;
-
-    if (isNaN(pageNumber) || pageNumber < 1) pageNumber = 1;
-    if (isNaN(limitNumber) || limitNumber < 1) limitNumber = 10;
-
-    const kmNumber = parseInt(km, 10);
-    const yearNumber = parseInt(year, 10);
-    const dailyPriceNumber = parseFloat(dailyPrice);
-
-    const filters: CarFilters = {
-      page: pageNumber,
-      limit: limitNumber,
-      brand,
-      km: kmNumber,
-      year: yearNumber,
-      dailyPrice: dailyPriceNumber,
+  async findAll(@Query() filters: CarFiltersDto) {
+    const carFilters: CarFilters = {
+      page: filters.page,
+      limit: filters.limit,
+      brand: filters.brand,
+      km: filters.km,
+      year: filters.year,
+      dailyPrice: filters.dailyPrice,
     };
 
-    return await this.carService.findAll(filters);
+    return await this.carService.findAll(carFilters);
   }
 
   @Get(':id')

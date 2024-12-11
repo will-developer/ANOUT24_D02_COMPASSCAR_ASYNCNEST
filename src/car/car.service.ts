@@ -36,15 +36,17 @@ export class CarService {
 
   async findAll(filters: CarFilters) {
     if (filters.page < 1 || filters.limit < 1) {
-      throw new Error('Page and limit must be greater than zero.');
+      throw new BadRequestException(
+        'Page and limit must be greater than zero.',
+      );
     }
 
     if (filters.km && filters.km < 0) {
-      throw new Error('Kilometers cannot be negative.');
+      throw new BadRequestException('Kilometers cannot be negative.');
     }
 
     if (filters.dailyPrice && filters.dailyPrice < 0) {
-      throw new Error('Daily price cannot be negative.');
+      throw new BadRequestException('Daily price cannot be negative.');
     }
     return this.repository.findAll(filters);
   }

@@ -5,8 +5,8 @@ import {
   Get,
   Param,
   ParseIntPipe,
+  Patch,
   Post,
-  Put,
   Query,
   UseGuards,
 } from '@nestjs/common';
@@ -59,7 +59,7 @@ export class ClientsController {
     status: 400,
     description: 'Invalid action',
   })
-  @Put(':id')
+  @Patch(':id')
   async updateClient(
     @Param('id', ParseIntPipe) id: number,
     @Body() data: UpdateClientDto,

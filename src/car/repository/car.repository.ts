@@ -33,14 +33,6 @@ export class CarRepository {
   async findAll(
     filters: CarFilters,
   ): Promise<{ data: CarEntity[]; total: number; totalPages?: number }> {
-    if (isNaN(filters.page)) {
-      filters.page = 1;
-    }
-
-    if (isNaN(filters.limit)) {
-      filters.limit = 10;
-    }
-
     const skip = (filters.page - 1) * filters.limit;
     const where = {
       ...(filters.brand && { brand: { contains: filters.brand } }),

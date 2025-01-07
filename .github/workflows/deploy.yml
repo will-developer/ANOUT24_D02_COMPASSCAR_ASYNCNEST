@@ -11,24 +11,16 @@ jobs:
     runs-on: ubuntu-latest
 
     steps:
-    - name: Checkout the files
-      uses: actions/checkout@v3
+      - name: Checkout the files
+        uses: actions/checkout@v3
 
-    - name: Copy files with SSH
-      uses: easingthemes/ssh-deploy@main
-      env:
-        SSH_PRIVATE_KEY: "MIIEpAIBAAKCAQEAwR7pipnaJrU8fKJXrwBPCue4dREkAA84H+j5QwbTANMEnTSmTl+3inaitjny9mK97vxGnAMeFhnHz+28MbDbeDKjsjzIqj4aQ34vbDmYBW2d6LE0T6CkWVtpsfBWomW5VS+6ddP0Pt1cRvKS300EFNEt35TDWVmXZACIjT4TAo/W2ZEnWva6qDyQd5hmRoe8DYtAxG80jzuqRN6YF+ip7Chy5mhtCoqKckGdZaeveiaWsoXQvlyD78hq2NX8gx7TzJNU9PTYeQEl/I+p6tkCZlL9h7XRRfssarN5lnsDQmYgs9mZa0/UfZuRJygdHWfEn1f22UFtfzLT3sV+wektxwIDAQABAoIBABX3DB0FjrhkWLLcTBjNcjANVv+JqYyQLpQCjYdAGXO4jIfM2zWC0X9gKvWK9cVsSaoK64UHHb7pw740jfkg4nVzXQcCvtgOJDKVAZPPoSjM5O74aLi9zrOTIBxq94+U/lVgDlckel1EFCDFqkrXmaU8fXk2lFlvRTbMkLtv2f2qZ+200OTIHM7j2IbaoKa2u0YLkc+9K+7/+IDVh4l7FiuZ1VIXoYK/5ElfP8BQBXOwJDUr2zt0Nk/upaxWvmM1xvq/zktss3jFQQd+QSD2YvHKt2oZRhqbvGh7BMDjuCaopFUH69WEhQ8fjOMiKd+LbIapayZFginBC36sycVmYVECgYEA5Nms3ueFriBKjaKrRkNs8a0Z7dXDIY6r4ItwMv5+MEjVI2ZPDBz2s5/lFBe1xilslvnQ7uA+Ns2pU29yEdcGXYqMM9CXh9KY7STG0radgsnMHzFvjnYxss0lXatZddvlwnAQHlO2rVscV+Fowr9Xcrt/DZ4NEg2n+MFTmBzWyYMCgYEA2Agb1Lm+VkR4qNOU4MXsxSE4hiDrAO5ubDZfnUBXL5Gak7XHyn0Euf+BYhlE5P97kK07xYXxLmzAlyMtSOnot6F6JVvC8UK3Seuo8rTDpCW1VC1zPqAxFxwHgcku15IFuefftL2a2arAwG1GkKQUtqb93yUQfLa9Bh+QhT0kS20CgYEAlG5nBJCwEPdaw7DNXB5hbAM1PSCXlo1eB58JH9oW6KRksbgq7xVeIbVEtJqISMYXa3kOvdDuKUeNWtN+7flEZKl3NChIEE1U6QMgfgz57pmKbnT3ATTCGVGbubxootwEku9yVOlBJAFjSdCmzSGjy4O27ZMksR/wYZSq7o9N9JcCgYEAtTZoEhMU5ExfYk7JLZsZN2rcfTaTqp5WphMeNUxJVi+vGIR9aQ9hrZv0LhPARM9CGWQXJWNromO7UYxCak071v1u9nN4nOQ315wEhkK3cbPn3QqbB0dcpmPusCHQVye4Ae/NKVF62WdwdHm1nZLlhSmi/1GZ+ONYwBAuLHXTQikCgYABvCBbEsy6e/Aw9dDsEzebOzf50BukNVRGTOX/NtaWrPOdsmJf8llJlv2rcEd+GBCFMvAFoXAxL5tBFMRXenu0F6rSdxWSQTVUd0mMdPPYsYkMl1weYPlRZ+X9qjHNHsXcCWAcY6DZxaC0VEVJIvYDNDLXaZibGYQbERrVpqpDYQ=="
-        ARGS: "-rltgoDzvO --delete"
-        SOURCE: "./"
-        REMOTE_HOST: "ec2-3-134-247-1.us-east-2.compute.amazonaws.com"
-        REMOTE_USER: "ec2-user"
-        TARGET: "/home/ec2-user"
-        EXCLUDE: "/dist/, /node_modules/, **.env, rebuild_app.sh, watcher.sh"
-
-    - name: Post-deploy commands
-      run: |
-        ssh -o StrictHostKeyChecking=no ec2-user@ec2-3-134-247-1.us-east-2.compute.amazonaws.com << 'EOF'
-        cd /home/ec2-user
-        npm install
-        pm2 restart all || pm2 start dist/src/main.js --name "nest-app"
-        EOF
+      - name: Copy files with SSH
+        uses: easingthemes/ssh-deploy@main
+        env:
+          SSH_PRIVATE_KEY: ${{ secrets.EC2_SSH_KEY }}
+          ARGS: "-rltgoDzvO --delete"
+          SOURCE: "./"
+          REMOTE_HOST: "ec2-3-134-247-1.us-east-2.compute.amazonaws.com"
+          REMOTE_USER: "ec2-user"
+          TARGET: "/home/ec2-user"
+          EXCLUDE: "/dist/, /node_modules/, **.env, rebuild_app.sh, watcher.sh"
